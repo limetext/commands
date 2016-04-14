@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	. "github.com/limetext/lime-backend/lib"
-	"github.com/limetext/lime-backend/lib/util"
 	"github.com/limetext/text"
+	"github.com/limetext/util"
 )
 
 const (
