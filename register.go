@@ -5,8 +5,8 @@
 package commands
 
 import (
-	"github.com/limetext/lime-backend/lib"
-	"github.com/limetext/lime-backend/lib/log"
+	"github.com/limetext/backend"
+	"github.com/limetext/backend/log"
 )
 
 type namedCmd struct {

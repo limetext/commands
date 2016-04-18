@@ -7,7 +7,7 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 	. "github.com/limetext/text"
 )
 

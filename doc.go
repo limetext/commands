@@ -7,7 +7,7 @@
 //
 // Typically the package is imported by a frontend via
 // 		import (
-// 			_ "github.com/limetext/lime-backend/lib/commands"
+// 			_ "github.com/limetext/backend/commands"
 //		)
 //
 // See the wiki page for more details on implementing commands:

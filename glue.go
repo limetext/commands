@@ -7,7 +7,7 @@ package commands
 import (
 	"fmt"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 )
 
 const lime_cmd_mark = "lime.cmd.mark"

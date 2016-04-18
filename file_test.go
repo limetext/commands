@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 )
 
 func TestNewFile(t *testing.T) {

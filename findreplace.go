@@ -7,7 +7,7 @@ package commands
 import (
 	"errors"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 	. "github.com/limetext/text"
 )
 

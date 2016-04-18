@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 	. "github.com/limetext/text"
 )
 

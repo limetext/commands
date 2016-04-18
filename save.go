@@ -7,7 +7,7 @@ package commands
 import (
 	"fmt"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 )
 
 type (

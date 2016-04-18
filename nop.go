@@ -4,7 +4,7 @@
 
 package commands
 
-import . "github.com/limetext/lime-backend/lib"
+import . "github.com/limetext/backend"
 
 type (
 	NopApplicationCommand struct {

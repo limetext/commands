@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 )
 
 var testfile string = "testdata/save_test.txt"

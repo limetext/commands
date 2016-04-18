@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unicode"
 
-	. "github.com/limetext/lime-backend/lib"
+	. "github.com/limetext/backend"
 )
 
 type (
