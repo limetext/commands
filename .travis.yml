@@ -20,8 +20,16 @@ matrix:
   allow_failures:
   - go: tip
 
+addons:
+  apt:
+    sources:
+      - deadsnakes
+    packages:
+      - libonig-dev
+      - xclip
+
 install:
-  - make cover_dep glide tasks
+  - make travis cover_dep glide tasks
 
 script:
   - make travis_test
