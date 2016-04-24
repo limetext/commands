@@ -361,7 +361,8 @@ func reverse(s string) string {
 }
 
 func (c *ScrollLinesCommand) Run(v *View, e *Edit) error {
-	fe := GetEditor().Frontend()
+	ed := GetEditor()
+	fe := ed.Frontend()
 	vr := fe.VisibleRegion(v)
 	var r int
 	if c.Amount >= 0 {

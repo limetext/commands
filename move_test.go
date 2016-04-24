@@ -1681,8 +1681,18 @@ func TestMoveTo(t *testing.T) {
 }
 
 type scfe struct {
-	DummyFrontend
-	show Region
+	show          Region
+	defaultAction bool
+}
+
+func (f *scfe) SetDefaultAction(action bool) {
+	f.defaultAction = action
+}
+func (f *scfe) StatusMessage(msg string) {}
+func (f *scfe) ErrorMessage(msg string)  {}
+func (f *scfe) MessageDialog(msg string) {}
+func (f *scfe) OkCancelDialog(msg string, button string) bool {
+	return f.defaultAction
 }
 
 func (f *scfe) VisibleRegion(v *View) Region {
@@ -1706,7 +1716,6 @@ func TestScrollLines(t *testing.T) {
 	v := w.NewFile()
 	defer func() {
 		v.SetScratch(true)
-		v.Close()
 	}()
 
 	e := v.BeginEdit()

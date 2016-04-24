@@ -131,8 +131,9 @@ func TestSaveAll(t *testing.T) {
 	}
 
 	ed := GetEditor()
+	ed.SetFrontend(&scfe{})
 	fe := ed.Frontend()
-	if dfe, ok := fe.(*DummyFrontend); ok {
+	if dfe, ok := fe.(*scfe); ok {
 		// Make it *not* reload the file
 		dfe.SetDefaultAction(false)
 	}
