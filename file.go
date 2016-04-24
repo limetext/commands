@@ -9,30 +9,30 @@ import (
 )
 
 type (
-	NewFileCommand struct {
+	NewFile struct {
 		DefaultCommand
 	}
 
-	OpenFileCommand struct {
+	OpenFile struct {
 		DefaultCommand
 		Path string
 	}
 )
 
-func (c *NewFileCommand) Run(w *Window) error {
+func (c *NewFile) Run(w *Window) error {
 	ed := GetEditor()
 	ed.ActiveWindow().NewFile()
 	return nil
 }
 
-func (o *OpenFileCommand) Run(w *Window) error {
+func (o *OpenFile) Run(w *Window) error {
 	w.OpenFile(o.Path, 0)
 	return nil
 }
 
 func init() {
 	register([]Command{
-		&NewFileCommand{},
-		&OpenFileCommand{},
+		&NewFile{},
+		&OpenFile{},
 	})
 }

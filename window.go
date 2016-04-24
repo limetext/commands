@@ -9,73 +9,73 @@ import (
 )
 
 type (
-	NewWindowCommand struct {
+	NewWindow struct {
 		DefaultCommand
 	}
 
-	CloseAllCommand struct {
+	CloseAll struct {
 		DefaultCommand
 	}
 
-	CloseWindowCommand struct {
+	CloseWindow struct {
 		DefaultCommand
 	}
 
-	NewWindowAppCommand struct {
+	NewWindowApp struct {
 		DefaultCommand
 	}
 
-	CloseWindowAppCommand struct {
+	CloseWindowApp struct {
 		DefaultCommand
 	}
 )
 
-func (c *NewWindowCommand) Run(w *Window) error {
+func (c *NewWindow) Run(w *Window) error {
 	ed := GetEditor()
 	ed.SetActiveWindow(ed.NewWindow())
 	return nil
 }
 
-func (c *CloseAllCommand) Run(w *Window) error {
+func (c *CloseAll) Run(w *Window) error {
 	w.CloseAllViews()
 	return nil
 }
 
-func (c *CloseWindowCommand) Run(w *Window) error {
+func (c *CloseWindow) Run(w *Window) error {
 	ed := GetEditor()
 	ed.ActiveWindow().Close()
 	return nil
 }
 
-func (c *NewWindowAppCommand) Run() error {
+func (c *NewWindowApp) Run() error {
 	ed := GetEditor()
 	ed.SetActiveWindow(ed.NewWindow())
 	return nil
 }
 
-func (c *CloseWindowAppCommand) Run() error {
+func (c *CloseWindowApp) Run() error {
 	ed := GetEditor()
 	ed.ActiveWindow().Close()
 	return nil
 }
 
-func (c *NewWindowAppCommand) IsChecked() bool {
+func (c *NewWindowApp) IsChecked() bool {
 	return false
 }
 
-func (c *CloseWindowAppCommand) IsChecked() bool {
+func (c *CloseWindowApp) IsChecked() bool {
 	return false
 }
 
 func init() {
 	register([]Command{
-		&NewWindowCommand{},
-		&CloseAllCommand{},
-		&CloseWindowCommand{},
+		&NewWindow{},
+		&CloseAll{},
+		&CloseWindow{},
 	})
 
 	registerByName([]namedCmd{
-		{"new_window", &NewWindowAppCommand{}},
-		{"close_window", &CloseWindowAppCommand{}},
+		{"new_window", &NewWindowApp{}},
+		{"close_window", &CloseWindowApp{}},
 	})
 }

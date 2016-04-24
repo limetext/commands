@@ -17,7 +17,7 @@ type (
 	// "this is some sample text"
 	// turns in to:
 	// "This Is Some Sample Text"
-	TitleCaseCommand struct {
+	TitleCase struct {
 		DefaultCommand
 	}
 
@@ -27,26 +27,26 @@ type (
 	// "Hello, World!"
 	// turns in to:
 	// "hELLO, wORLD!"
-	SwapCaseCommand struct {
+	SwapCase struct {
 		DefaultCommand
 	}
 
 	// The UpperCaseCommand transforms all selections
 	// so that each character in the selection
 	// is in its upper case equivalent (if any.)
-	UpperCaseCommand struct {
+	UpperCase struct {
 		DefaultCommand
 	}
 
 	// The LowerCaseCommand transforms all selections
 	// so that each character in the selection
 	// is in its lower case equivalent
-	LowerCaseCommand struct {
+	LowerCase struct {
 		DefaultCommand
 	}
 )
 
-func (c *TitleCaseCommand) Run(v *View, e *Edit) error {
+func (c *TitleCase) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -58,7 +58,7 @@ func (c *TitleCaseCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SwapCaseCommand) Run(v *View, e *Edit) error {
+func (c *SwapCase) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -79,7 +79,7 @@ func (c *SwapCaseCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *UpperCaseCommand) Run(v *View, e *Edit) error {
+func (c *UpperCase) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -91,7 +91,7 @@ func (c *UpperCaseCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *LowerCaseCommand) Run(v *View, e *Edit) error {
+func (c *LowerCase) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -105,9 +105,9 @@ func (c *LowerCaseCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&TitleCaseCommand{},
-		&SwapCaseCommand{},
-		&UpperCaseCommand{},
-		&LowerCaseCommand{},
+		&TitleCase{},
+		&SwapCase{},
+		&UpperCase{},
+		&LowerCase{},
 	})
 }

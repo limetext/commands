@@ -7,39 +7,39 @@ package commands
 import . "github.com/limetext/backend"
 
 type (
-	NopApplicationCommand struct {
+	NopApplication struct {
 		BypassUndoCommand
 	}
 
-	NopWindowCommand struct {
+	NopWindow struct {
 		BypassUndoCommand
 	}
 
-	NopTextCommand struct {
+	NopText struct {
 		BypassUndoCommand
 	}
 )
 
-func (c *NopApplicationCommand) Run() error {
+func (c *NopApplication) Run() error {
 	return nil
 }
 
-func (c *NopApplicationCommand) IsChecked() bool {
+func (c *NopApplication) IsChecked() bool {
 	return false
 }
 
-func (c *NopWindowCommand) Run(w *Window) error {
+func (c *NopWindow) Run(w *Window) error {
 	return nil
 }
 
-func (c *NopTextCommand) Run(v *View, e *Edit) error {
+func (c *NopText) Run(v *View, e *Edit) error {
 	return nil
 }
 
 func init() {
 	registerByName([]namedCmd{
-		{"nop", &NopApplicationCommand{}},
-		{"nop", &NopWindowCommand{}},
-		{"nop", &NopTextCommand{}},
+		{"nop", &NopApplication{}},
+		{"nop", &NopWindow{}},
+		{"nop", &NopText{}},
 	})
 }

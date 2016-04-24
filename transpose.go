@@ -12,12 +12,12 @@ import (
 type (
 	// Transpose: Swap the characters on either side of the cursor,
 	// then move the cursor forward one character.
-	TransposeCommand struct {
+	Transpose struct {
 		DefaultCommand
 	}
 )
 
-func (c *TransposeCommand) Run(v *View, e *Edit) error {
+func (c *Transpose) Run(v *View, e *Edit) error {
 	/*
 		Correct behavior of Transpose:
 			- ...is actually surprisingly complicated.
@@ -93,6 +93,6 @@ func (c *TransposeCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&TransposeCommand{},
+		&Transpose{},
 	})
 }

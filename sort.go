@@ -15,7 +15,7 @@ import (
 type (
 	// The SortLinesCommand sorts all lines
 	// intersecting a selection region
-	SortLinesCommand struct {
+	SortLines struct {
 		DefaultCommand
 		CaseSensitive    bool
 		Reverse          bool
@@ -25,7 +25,7 @@ type (
 	// The SortSelectionCommand sorts contents
 	// of each selection region with respect to
 	// each other
-	SortSelectionCommand struct {
+	SortSelection struct {
 		DefaultCommand
 		CaseSensitive    bool
 		Reverse          bool
@@ -72,7 +72,7 @@ func (s textSorter) Less(i, j int) bool {
 	return textA < textB
 }
 
-func (c *SortLinesCommand) Run(v *View, e *Edit) error {
+func (c *SortLines) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	// Used as a set of int
 	sorted_rows := make(map[int]bool)
@@ -118,7 +118,7 @@ func (c *SortLinesCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SortSelectionCommand) Run(v *View, e *Edit) error {
+func (c *SortSelection) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	regions := make([]Region, sel.Len())
 	texts := make([]string, sel.Len())
@@ -182,7 +182,7 @@ func removeDuplicates(caseSensitive bool, xs []string) []string {
 
 func init() {
 	register([]Command{
-		&SortLinesCommand{},
-		&SortSelectionCommand{},
+		&SortLines{},
+		&SortSelection{},
 	})
 }

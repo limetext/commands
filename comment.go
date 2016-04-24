@@ -12,12 +12,12 @@ import (
 )
 
 type (
-	ToggleCommentCommand struct {
+	ToggleComment struct {
 		DefaultCommand
 	}
 )
 
-func (c *ToggleCommentCommand) Run(v *View, e *Edit) error {
+func (c *ToggleComment) Run(v *View, e *Edit) error {
 	// TODO: Comment the line if we only have a cursor.
 	// TODO: Expand the selection after altering it.
 	// TODO: Align the comment characters for multiline selections.
@@ -49,6 +49,6 @@ func (c *ToggleCommentCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&ToggleCommentCommand{},
+		&ToggleComment{},
 	})
 }

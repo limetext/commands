@@ -9,34 +9,34 @@ import (
 )
 
 type (
-	UndoCommand struct {
+	Undo struct {
 		BypassUndoCommand
 		hard bool
 	}
-	RedoCommand struct {
+	Redo struct {
 		BypassUndoCommand
 		hard bool
 	}
 )
 
-func (c *UndoCommand) Run(v *View, e *Edit) error {
+func (c *Undo) Run(v *View, e *Edit) error {
 	v.UndoStack().Undo(c.hard)
 	return nil
 }
 
-func (c *RedoCommand) Run(v *View, e *Edit) error {
+func (c *Redo) Run(v *View, e *Edit) error {
 	v.UndoStack().Redo(c.hard)
 	return nil
 }
 
 func init() {
 	register([]Command{
-		&UndoCommand{hard: true},
-		&RedoCommand{hard: true},
+		&Undo{hard: true},
+		&Redo{hard: true},
 	})
 
 	registerByName([]namedCmd{
-		{"soft_undo", &UndoCommand{}},
-		{"soft_redo", &RedoCommand{}},
+		{"soft_undo", &Undo{}},
+		{"soft_redo", &Redo{}},
 	})
 }

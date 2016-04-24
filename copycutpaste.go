@@ -13,15 +13,15 @@ import (
 )
 
 type (
-	CopyCommand struct {
+	Copy struct {
 		DefaultCommand
 	}
 
-	CutCommand struct {
+	Cut struct {
 		DefaultCommand
 	}
 
-	PasteCommand struct {
+	Paste struct {
 		DefaultCommand
 	}
 )
@@ -58,7 +58,7 @@ func getSelSubstrs(v *View, rs *text.RegionSet) []string {
 	return s
 }
 
-func (c *CopyCommand) Run(v *View, e *Edit) error {
+func (c *Copy) Run(v *View, e *Edit) error {
 	rs := getRegions(v, false)
 	s := getSelSubstrs(v, rs)
 
@@ -67,7 +67,7 @@ func (c *CopyCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *CutCommand) Run(v *View, e *Edit) error {
+func (c *Cut) Run(v *View, e *Edit) error {
 	s := getSelSubstrs(v, getRegions(v, false))
 
 	rs := getRegions(v, true)
@@ -82,7 +82,7 @@ func (c *CutCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *PasteCommand) Run(v *View, e *Edit) error {
+func (c *Paste) Run(v *View, e *Edit) error {
 	// TODO: Paste the entire line on the line before the cursor if a
 	//		 line was autocopied.
 
@@ -101,8 +101,8 @@ func (c *PasteCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&CopyCommand{},
-		&CutCommand{},
-		&PasteCommand{},
+		&Copy{},
+		&Cut{},
+		&Paste{},
 	})
 }

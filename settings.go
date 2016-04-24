@@ -11,20 +11,20 @@ import (
 type (
 	// The ToggleSettingCommand toggles the value of a setting,
 	// making it false when it was true or true when it was false.
-	ToggleSettingCommand struct {
+	ToggleSetting struct {
 		BypassUndoCommand
 		Setting string
 	}
 
 	// The SetSettingCommand set the value of a setting.
-	SetSettingCommand struct {
+	SetSetting struct {
 		BypassUndoCommand
 		Setting string
 		Value   interface{}
 	}
 )
 
-func (c *ToggleSettingCommand) Run(v *View, e *Edit) error {
+func (c *ToggleSetting) Run(v *View, e *Edit) error {
 	setting := c.Setting
 	prev, boolean := v.Settings().Get(setting, false).(bool)
 	// if the setting was non-boolean, it is set to true, else it is toggled
@@ -32,7 +32,7 @@ func (c *ToggleSettingCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SetSettingCommand) Run(v *View, e *Edit) error {
+func (c *SetSetting) Run(v *View, e *Edit) error {
 	setting := c.Setting
 	v.Settings().Set(setting, c.Value)
 	return nil
@@ -40,7 +40,7 @@ func (c *SetSettingCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&ToggleSettingCommand{},
-		&SetSettingCommand{},
+		&ToggleSetting{},
+		&SetSetting{},
 	})
 }

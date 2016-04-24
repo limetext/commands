@@ -30,7 +30,7 @@ func TestTranspose(t *testing.T) {
 		newregions []Region
 	}
 
-	// Test results produced using ST3, and commands like:
+	// Test results produced using ST3, and s like:
 	// >>> rs.add_all([sublime.Region(0,0),sublime.Region(4,7),sublime.Region(9,9),sublime.Region(15,16)])
 	// >>> v.run_command("transpose")
 	// >>> print([a for a in v.sel()])

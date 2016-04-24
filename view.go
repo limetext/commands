@@ -9,30 +9,30 @@ import (
 )
 
 type (
-	CloseViewCommand struct {
+	CloseView struct {
 		DefaultCommand
 	}
 
-	NextViewCommand struct {
+	NextView struct {
 		DefaultCommand
 	}
 
-	PrevViewCommand struct {
+	PrevView struct {
 		DefaultCommand
 	}
 
-	SetFileTypeCommand struct {
+	SetFileType struct {
 		DefaultCommand
 		Syntax string
 	}
 )
 
-func (c *CloseViewCommand) Run(w *Window) error {
+func (c *CloseView) Run(w *Window) error {
 	w.ActiveView().Close()
 	return nil
 }
 
-func (c *NextViewCommand) Run(w *Window) error {
+func (c *NextView) Run(w *Window) error {
 	for i, v := range w.Views() {
 		if v == w.ActiveView() {
 			i++
@@ -47,7 +47,7 @@ func (c *NextViewCommand) Run(w *Window) error {
 	return nil
 }
 
-func (c *PrevViewCommand) Run(w *Window) error {
+func (c *PrevView) Run(w *Window) error {
 	for i, v := range w.Views() {
 		if v == w.ActiveView() {
 			if i == 0 {
@@ -62,16 +62,16 @@ func (c *PrevViewCommand) Run(w *Window) error {
 	return nil
 }
 
-func (c *SetFileTypeCommand) Run(v *View, e *Edit) error {
+func (c *SetFileType) Run(v *View, e *Edit) error {
 	v.SetSyntaxFile(c.Syntax)
 	return nil
 }
 
 func init() {
 	register([]Command{
-		&CloseViewCommand{},
-		&NextViewCommand{},
-		&PrevViewCommand{},
-		&SetFileTypeCommand{},
+		&CloseView{},
+		&NextView{},
+		&PrevView{},
+		&SetFileType{},
 	})
 }

@@ -12,16 +12,16 @@ import (
 type (
 	// The SingleSelectionCommand merges multiple cursors
 	// into a single one.
-	SingleSelectionCommand struct {
+	SingleSelection struct {
 		DefaultCommand
 	}
 	// The SelectAllCommand selects the whole buffer of the current file
-	SelectAllCommand struct {
+	SelectAll struct {
 		DefaultCommand
 	}
 )
 
-func (c *SingleSelectionCommand) Run(v *View, e *Edit) error {
+func (c *SingleSelection) Run(v *View, e *Edit) error {
 	/*
 		Correct behavior of SingleSelect:
 			- Remove all selection regions but the first.
@@ -33,7 +33,7 @@ func (c *SingleSelectionCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SelectAllCommand) Run(v *View, e *Edit) error {
+func (c *SelectAll) Run(v *View, e *Edit) error {
 	/*
 		Correct behavior of SelectAll:
 			- Select a single region of (0, view.buffersize())
@@ -47,7 +47,7 @@ func (c *SelectAllCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&SingleSelectionCommand{},
-		&SelectAllCommand{},
+		&SingleSelection{},
+		&SelectAll{},
 	})
 }

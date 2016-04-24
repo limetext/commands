@@ -11,7 +11,7 @@ import (
 	. "github.com/limetext/text"
 )
 
-func TestUndoRedoCommands(t *testing.T) {
+func TestUndoRedos(t *testing.T) {
 	ed := GetEditor()
 	ch := ed.CommandHandler()
 	w := ed.NewWindow()

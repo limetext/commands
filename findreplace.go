@@ -17,14 +17,14 @@ type (
 	// If one character or more is selected, the text buffer is scanned for
 	// the next occurrence of the selection and that region too is added to
 	// the selection set.
-	FindUnderExpandCommand struct {
+	FindUnderExpand struct {
 		DefaultCommand
 	}
 	// The FindNext command searches for the last search term, starting at
 	// the end of the last selection in the buffer, and wrapping around. If
 	// it finds the term, it clears the current selections and selects the
 	// newly-found regions.
-	FindNextCommand struct {
+	FindNext struct {
 		DefaultCommand
 	}
 
@@ -32,7 +32,7 @@ type (
 	// and at the first occurance of the text, replaces it with the
 	// "new" argument text. If there are multiple regions, the find
 	// starts from the max region.
-	ReplaceNextCommand struct {
+	ReplaceNext struct {
 		DefaultCommand
 	}
 )
@@ -43,7 +43,7 @@ var (
 	replaceText string
 )
 
-func (c *FindUnderExpandCommand) Run(v *View, e *Edit) error {
+func (c *FindUnderExpand) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	rs := sel.Regions()
 
@@ -93,7 +93,7 @@ func nextSelection(v *View, search string) (Region, error) {
 	return Region{-1, -1}, errors.New("Selection not Found")
 }
 
-func (c *FindNextCommand) Run(v *View, e *Edit) error {
+func (c *FindNext) Run(v *View, e *Edit) error {
 	/*
 		Correct behavior of FindNext:
 			- If there is no previous search, do nothing
@@ -119,7 +119,7 @@ func (c *FindNextCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *ReplaceNextCommand) Run(v *View, e *Edit) error {
+func (c *ReplaceNext) Run(v *View, e *Edit) error {
 	// use selection function from find.go to get the next region
 	selection, err := nextSelection(v, string(lastSearch))
 	if err != nil {
@@ -132,8 +132,8 @@ func (c *ReplaceNextCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&FindUnderExpandCommand{},
-		&FindNextCommand{},
-		&ReplaceNextCommand{},
+		&FindUnderExpand{},
+		&FindNext{},
+		&ReplaceNext{},
 	})
 }

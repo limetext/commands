@@ -15,7 +15,7 @@ type (
 	// The InsertCommand inserts the given characters, at all
 	// of the current selection locations, possibly replacing
 	// text if the selection area covers one or more characters.
-	InsertCommand struct {
+	Insert struct {
 		DefaultCommand
 		// The characters to insert
 		Characters string
@@ -23,25 +23,25 @@ type (
 
 	// The LeftDeleteCommand deletes characters to the left of the
 	// current selection or the current selection if it is not empty.
-	LeftDeleteCommand struct {
+	LeftDelete struct {
 		DefaultCommand
 	}
 
 	// The RightDeleteCommand deletes characters to the right of the
 	// current selection or the current selection if it is not empty.
-	RightDeleteCommand struct {
+	RightDelete struct {
 		DefaultCommand
 	}
 
 	// The DeleteWordCommand deletes one word to right or left
 	// depending on forward variable
-	DeleteWordCommand struct {
+	DeleteWord struct {
 		DefaultCommand
 		Forward bool
 	}
 )
 
-func (c *InsertCommand) Run(v *View, e *Edit) error {
+func (c *Insert) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -54,7 +54,7 @@ func (c *InsertCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *LeftDeleteCommand) Run(v *View, e *Edit) error {
+func (c *LeftDelete) Run(v *View, e *Edit) error {
 	trim_space := false
 	tab_size := 4
 	if t, ok := v.Settings().Get("translate_tabs_to_spaces", false).(bool); ok && t {
@@ -103,7 +103,7 @@ func (c *LeftDeleteCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *RightDeleteCommand) Run(v *View, e *Edit) error {
+func (c *RightDelete) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	hasNonEmpty := sel.HasNonEmpty()
 	i := 0
@@ -125,7 +125,7 @@ func (c *RightDeleteCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *DeleteWordCommand) Run(v *View, e *Edit) error {
+func (c *DeleteWord) Run(v *View, e *Edit) error {
 	var class int
 	if c.Forward {
 		class = CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_START
@@ -157,7 +157,7 @@ func (c *DeleteWordCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *DeleteWordCommand) findByClass(point int, class int, v *View) int {
+func (c *DeleteWord) findByClass(point int, class int, v *View) int {
 	var end, d int
 	if c.Forward {
 		d = 1
@@ -191,9 +191,9 @@ func (c *DeleteWordCommand) findByClass(point int, class int, v *View) int {
 
 func init() {
 	register([]Command{
-		&InsertCommand{},
-		&LeftDeleteCommand{},
-		&RightDeleteCommand{},
-		&DeleteWordCommand{},
+		&Insert{},
+		&LeftDelete{},
+		&RightDelete{},
+		&DeleteWord{},
 	})
 }

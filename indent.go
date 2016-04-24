@@ -13,17 +13,17 @@ import (
 
 type (
 	// The IndentCommand increments indentation of selection.
-	IndentCommand struct {
+	Indent struct {
 		DefaultCommand
 	}
 
 	// The UnindentCommand decrements indentation of selection.
-	UnindentCommand struct {
+	Unindent struct {
 		DefaultCommand
 	}
 )
 
-func (c *IndentCommand) Run(v *View, e *Edit) error {
+func (c *Indent) Run(v *View, e *Edit) error {
 	indent := "\t"
 	if t, ok := v.Settings().Get("translate_tabs_to_spaces", false).(bool); ok && t {
 		indent = strings.Repeat(" ", getTabSize(v))
@@ -43,7 +43,7 @@ func (c *IndentCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *UnindentCommand) Run(v *View, e *Edit) error {
+func (c *Unindent) Run(v *View, e *Edit) error {
 	tab_size := getTabSize(v)
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
@@ -87,7 +87,7 @@ func getTabSize(v *View) int {
 
 func init() {
 	register([]Command{
-		&IndentCommand{},
-		&UnindentCommand{},
+		&Indent{},
+		&Unindent{},
 	})
 }

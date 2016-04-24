@@ -11,21 +11,21 @@ import (
 )
 
 type (
-	SaveCommand struct {
+	Save struct {
 		DefaultCommand
 	}
 
-	SaveAsCommand struct {
+	SaveAs struct {
 		DefaultCommand
 		Name string
 	}
 
-	SaveAllCommand struct {
+	SaveAll struct {
 		DefaultCommand
 	}
 )
 
-func (c *SaveCommand) Run(v *View, e *Edit) error {
+func (c *Save) Run(v *View, e *Edit) error {
 	err := v.Save()
 	if err != nil {
 		GetEditor().Frontend().ErrorMessage(fmt.Sprintf("Failed to save %s:n%s", v.FileName(), err))
@@ -34,7 +34,7 @@ func (c *SaveCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SaveAsCommand) Run(v *View, e *Edit) error {
+func (c *SaveAs) Run(v *View, e *Edit) error {
 	err := v.SaveAs(c.Name)
 	if err != nil {
 		GetEditor().Frontend().ErrorMessage(fmt.Sprintf("Failed to save as %s:n%s", c.Name, err))
@@ -43,7 +43,7 @@ func (c *SaveAsCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SaveAllCommand) Run(w *Window) error {
+func (c *SaveAll) Run(w *Window) error {
 	for _, v := range w.Views() {
 		if err := v.Save(); err != nil {
 			GetEditor().Frontend().ErrorMessage(fmt.Sprintf("Failed to save %s:n%s", v.FileName(), err))
@@ -55,8 +55,8 @@ func (c *SaveAllCommand) Run(w *Window) error {
 
 func init() {
 	register([]Command{
-		&SaveCommand{},
-		&SaveAsCommand{},
-		&SaveAllCommand{},
+		&Save{},
+		&SaveAs{},
+		&SaveAll{},
 	})
 }

@@ -84,7 +84,7 @@ func TestSaveAs(t *testing.T) {
 
 	v := w.OpenFile(testfile, 0)
 	e := v.BeginEdit()
-	v.Insert(e, 0, "Testing save_as command")
+	v.Insert(e, 0, "Testing save_as ")
 	v.BeginEdit()
 
 	name := "testdata/save_as_test.txt"
@@ -98,8 +98,8 @@ func TestSaveAs(t *testing.T) {
 	if _, err := os.Stat(name); os.IsNotExist(err) {
 		t.Errorf("The new test file %s wasn't created", name)
 	}
-	if data, _ := ioutil.ReadFile(name); "Testing save_as command" != string(data) {
-		t.Errorf("Expected %s, but got %s", "Testing save_as command", string(data))
+	if data, _ := ioutil.ReadFile(name); "Testing save_as " != string(data) {
+		t.Errorf("Expected %s, but got %s", "Testing save_as ", string(data))
 	}
 
 	// v.Close()

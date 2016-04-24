@@ -47,7 +47,7 @@ const (
 
 type (
 	// The MoveCommand moves the current selection
-	MoveCommand struct {
+	Move struct {
 		DefaultCommand
 		// Specifies the type of "move" operation
 		By MoveByType
@@ -78,7 +78,7 @@ type (
 	MoveToType int
 
 	// The MoveToCommand moves or extends the current selection to the specified location
-	MoveToCommand struct {
+	MoveTo struct {
 		DefaultCommand
 		// The type of "move_to" operation to perform
 		To MoveToType
@@ -87,7 +87,7 @@ type (
 	}
 
 	// The ScrollLinesCommand moves the viewpoint "Amount" lines from the current location
-	ScrollLinesCommand struct {
+	ScrollLines struct {
 		BypassUndoCommand
 		// The number of lines to scroll (positive or negative direction)
 		Amount int
@@ -135,7 +135,7 @@ func (mt *MoveToType) Set(v interface{}) error {
 	return nil
 }
 
-func (c *MoveToCommand) Run(v *View, e *Edit) error {
+func (c *MoveTo) Run(v *View, e *Edit) error {
 	switch c.To {
 	case EOL:
 		move_action(v, c.Extend, func(r text.Region) int {
@@ -248,7 +248,7 @@ func (m *MoveByType) Set(v interface{}) error {
 	return nil
 }
 
-func (c *MoveCommand) Run(v *View, e *Edit) error {
+func (c *Move) Run(v *View, e *Edit) error {
 	p := util.Prof.Enter("move.run.init")
 
 	p.Exit()
@@ -327,7 +327,7 @@ func (c *MoveCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *MoveCommand) Default(key string) interface{} {
+func (c *Move) Default(key string) interface{} {
 	if key == "separators" {
 		return DEFAULT_SEPARATORS
 	}
@@ -360,7 +360,7 @@ func reverse(s string) string {
 	return string(r)
 }
 
-func (c *ScrollLinesCommand) Run(v *View, e *Edit) error {
+func (c *ScrollLines) Run(v *View, e *Edit) error {
 	ed := GetEditor()
 	fe := ed.Frontend()
 	vr := fe.VisibleRegion(v)
@@ -379,8 +379,8 @@ func (c *ScrollLinesCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&MoveCommand{},
-		&MoveToCommand{},
-		&ScrollLinesCommand{},
+		&Move{},
+		&MoveTo{},
+		&ScrollLines{},
 	})
 }

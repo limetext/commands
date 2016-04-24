@@ -14,29 +14,29 @@ import (
 type (
 	// JoinCommand removes every new line in the
 	// selections and the first new line after
-	JoinCommand struct {
+	Join struct {
 		DefaultCommand
 	}
 
-	SelectLinesCommand struct {
+	SelectLines struct {
 		DefaultCommand
 		Forward bool
 	}
 
-	SwapLineUpCommand struct {
+	SwapLineUp struct {
 		DefaultCommand
 	}
 
-	SwapLineDownCommand struct {
+	SwapLineDown struct {
 		DefaultCommand
 	}
 
-	SplitSelectionIntoLinesCommand struct {
+	SplitSelectionIntoLines struct {
 		DefaultCommand
 	}
 )
 
-func (c *JoinCommand) Run(v *View, e *Edit) error {
+func (c *Join) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -72,7 +72,7 @@ func (c *JoinCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SwapLineUpCommand) Run(v *View, e *Edit) error {
+func (c *SwapLineUp) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -91,7 +91,7 @@ func (c *SwapLineUpCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SwapLineDownCommand) Run(v *View, e *Edit) error {
+func (c *SwapLineDown) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -110,7 +110,7 @@ func (c *SwapLineDownCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SelectLinesCommand) Run(v *View, e *Edit) error {
+func (c *SelectLines) Run(v *View, e *Edit) error {
 	var (
 		rs      []Region
 		line, l Region
@@ -144,7 +144,7 @@ func (c *SelectLinesCommand) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SplitSelectionIntoLinesCommand) Run(v *View, e *Edit) error {
+func (c *SplitSelectionIntoLines) Run(v *View, e *Edit) error {
 	var rs []Region
 
 	sel := v.Sel()
@@ -168,10 +168,10 @@ func (c *SplitSelectionIntoLinesCommand) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&JoinCommand{},
-		&SelectLinesCommand{},
-		&SwapLineUpCommand{},
-		&SwapLineDownCommand{},
-		&SplitSelectionIntoLinesCommand{},
+		&Join{},
+		&SelectLines{},
+		&SwapLineUp{},
+		&SwapLineDown{},
+		&SplitSelectionIntoLines{},
 	})
 }

@@ -10,27 +10,27 @@ import (
 	. "github.com/limetext/backend"
 )
 
-func TestRunApplicationCommand(t *testing.T) {
-	nopApplicationCommand := NopApplicationCommand{}
+func TestRunApplication(t *testing.T) {
+	nopApplication := NopApplication{}
 
-	if nopApplicationCommand.Run() != nil {
+	if nopApplication.Run() != nil {
 		t.Error("No op application command running returns not nil")
 	}
 
 }
 
-func TestRunNopWindowCommand(t *testing.T) {
-	nopWindowCommand := NopWindowCommand{}
+func TestRunNopWindow(t *testing.T) {
+	nopWindow := NopWindow{}
 
-	if nopWindowCommand.Run(&Window{}) != nil {
+	if nopWindow.Run(&Window{}) != nil {
 		t.Error("No op window command running returns not nil")
 	}
 }
 
-func TestRunNopTextCommand(t *testing.T) {
-	nopTextCommand := NopTextCommand{}
+func TestRunNopText(t *testing.T) {
+	nopText := NopText{}
 
-	if nopTextCommand.Run(&View{}, &Edit{}) != nil {
+	if nopText.Run(&View{}, &Edit{}) != nil {
 		t.Error("No op text command running returns not nil")
 	}
 }
