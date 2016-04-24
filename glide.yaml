@@ -1,0 +1,10 @@
+package: github.com/limetext/commands
+import:
+- package: github.com/limetext/backend
+  version: master
+  subpackages:
+  - log
+- package: github.com/limetext/text
+  version: master
+- package: github.com/limetext/util
+  version: master
