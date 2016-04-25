@@ -10,16 +10,20 @@ import (
 	. "github.com/limetext/backend"
 )
 
-func TestCloseView(t *testing.T) {
+func TestClose(t *testing.T) {
 	ed := GetEditor()
 
+	l := len(ed.Windows())
 	w := ed.NewWindow()
-	defer w.Close()
+	ed.CommandHandler().RunWindowCommand(w, "close", nil)
+	if got, exp := len(ed.Windows()), l; got != exp {
+		t.Error("When there is no view the window should close")
+		t.Errorf("Expected %d windows, but got %d", exp, got)
+	}
 
-	l := len(w.Views())
-	testPath := "open_file_test.go"
-	ed.CommandHandler().RunWindowCommand(w, "open_file", Args{"path": testPath})
-	ed.CommandHandler().RunWindowCommand(w, "close_view", nil)
+	l = len(w.Views())
+	w.NewFile()
+	ed.CommandHandler().RunWindowCommand(w, "close", nil)
 
 	if len(w.Views()) != l {
 		t.Errorf("Expected %d view, but got %d", l, len(w.Views()))

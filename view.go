@@ -4,12 +4,10 @@
 
 package commands
 
-import (
-	. "github.com/limetext/backend"
-)
+import . "github.com/limetext/backend"
 
 type (
-	CloseView struct {
+	Close struct {
 		DefaultCommand
 	}
 
@@ -27,8 +25,12 @@ type (
 	}
 )
 
-func (c *CloseView) Run(w *Window) error {
-	w.ActiveView().Close()
+func (c *Close) Run(w *Window) error {
+	if v := w.ActiveView(); v != nil {
+		v.Close()
+	} else {
+		w.Close()
+	}
 	return nil
 }
 
@@ -69,7 +71,7 @@ func (c *SetFileType) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&CloseView{},
+		&Close{},
 		&NextView{},
 		&PrevView{},
 		&SetFileType{},
