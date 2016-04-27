@@ -12,9 +12,9 @@ import (
 )
 
 type (
-	// JoinCommand removes every new line in the
+	// JoinLines removes every new line in the
 	// selections and the first new line after
-	Join struct {
+	JoinLines struct {
 		DefaultCommand
 	}
 
@@ -36,7 +36,7 @@ type (
 	}
 )
 
-func (c *Join) Run(v *View, e *Edit) error {
+func (c *JoinLines) Run(v *View, e *Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -168,7 +168,7 @@ func (c *SplitSelectionIntoLines) Run(v *View, e *Edit) error {
 
 func init() {
 	register([]Command{
-		&Join{},
+		&JoinLines{},
 		&SelectLines{},
 		&SwapLineUp{},
 		&SwapLineDown{},

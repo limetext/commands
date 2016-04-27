@@ -11,14 +11,12 @@ import (
 	. "github.com/limetext/text"
 )
 
-func TestJoin(t *testing.T) {
-	type JoinTest struct {
+func TestJoinLines(t *testing.T) {
+	tests := []struct {
 		text   string
 		sel    []Region
 		expect string
-	}
-
-	tests := []JoinTest{
+	}{
 		{
 			"a\n\t  bc",
 			[]Region{{1, 1}},
@@ -67,14 +65,12 @@ func TestJoin(t *testing.T) {
 }
 
 func TestSelectLines(t *testing.T) {
-	type SelectLinesTest struct {
+	tests := []struct {
 		text    string
 		sel     []Region
 		forward bool
 		expect  []Region
-	}
-
-	tests := []SelectLinesTest{
+	}{
 		{
 			"abc\ndefg",
 			[]Region{{1, 1}},
@@ -150,13 +146,11 @@ func TestSelectLines(t *testing.T) {
 }
 
 func TestSwapLine(t *testing.T) {
-	type SwapLineTest struct {
+	uptests := []struct {
 		text   string
 		sel    []Region
 		expect string
-	}
-
-	uptests := []SwapLineTest{
+	}{
 		{
 			"a\nb",
 			[]Region{{2, 2}},
@@ -228,13 +222,11 @@ func TestSwapLine(t *testing.T) {
 }
 
 func TestSplitToLines(t *testing.T) {
-	type SplitToLinesTest struct {
+	tests := []struct {
 		text   string
 		sel    []Region
 		expect []Region
-	}
-
-	tests := []SplitToLinesTest{
+	}{
 		{
 			"ab\ncd\nef",
 			[]Region{{4, 7}},

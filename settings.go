@@ -22,6 +22,22 @@ type (
 		Setting string
 		Value   interface{}
 	}
+
+	ToggleSideBar struct {
+		BypassUndoCommand
+	}
+
+	ToggleStatuseBar struct {
+		BypassUndoCommand
+	}
+
+	ToggleFullScreen struct {
+		BypassUndoCommand
+	}
+
+	ToggleDsitractionFree struct {
+		BypassUndoCommand
+	}
 )
 
 func (c *ToggleSetting) Run(v *View, e *Edit) error {
@@ -38,9 +54,37 @@ func (c *SetSetting) Run(v *View, e *Edit) error {
 	return nil
 }
 
+func (c *ToggleSideBar) Run(w *Window) error {
+	res, ok := v.Settings().Get(setting, false).(bool)
+	v.Settings().Set(setting, !ok || !res)
+	return nil
+}
+
+func (c *ToggleStatuseBar) Run(w *Window) error {
+	res, ok := v.Settings().Get(setting, false).(bool)
+	v.Settings().Set(setting, !ok || !res)
+	return nil
+}
+
+func (c *ToggleFullScreen) Run(w *Window) error {
+	res, ok := v.Settings().Get(setting, false).(bool)
+	v.Settings().Set(setting, !ok || !res)
+	return nil
+}
+
+func (c *ToggleDsitractionFree) Run(w *Window) error {
+	res, ok := v.Settings().Get(setting, false).(bool)
+	v.Settings().Set(setting, !ok || !res)
+	return nil
+}
+
 func init() {
 	register([]Command{
 		&ToggleSetting{},
 		&SetSetting{},
+		&ToggleSideBar{},
+		&ToggleStatuseBar{},
+		&ToggleFullScreen{},
+		&ToggleDsitractionFree{},
 	})
 }
