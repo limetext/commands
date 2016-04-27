@@ -27,7 +27,7 @@ type (
 		BypassUndoCommand
 	}
 
-	ToggleStatuseBar struct {
+	ToggleStatusBar struct {
 		BypassUndoCommand
 	}
 
@@ -35,7 +35,7 @@ type (
 		BypassUndoCommand
 	}
 
-	ToggleDsitractionFree struct {
+	ToggleDistractionFree struct {
 		BypassUndoCommand
 	}
 )
@@ -60,7 +60,7 @@ func (c *ToggleSideBar) Run(w *Window) error {
 	return nil
 }
 
-func (c *ToggleStatuseBar) Run(w *Window) error {
+func (c *ToggleStatusBar) Run(w *Window) error {
 	res, ok := w.Settings().Get("toggle_status_bar", false).(bool)
 	w.Settings().Set("toggle_status_bar", !ok || !res)
 	return nil
@@ -72,7 +72,7 @@ func (c *ToggleFullScreen) Run(w *Window) error {
 	return nil
 }
 
-func (c *ToggleDsitractionFree) Run(w *Window) error {
+func (c *ToggleDistractionFree) Run(w *Window) error {
 	res, ok := w.Settings().Get("toggle_distraction_free", false).(bool)
 	w.Settings().Set("toggle_distraction_free", !ok || !res)
 	return nil
@@ -83,8 +83,8 @@ func init() {
 		&ToggleSetting{},
 		&SetSetting{},
 		&ToggleSideBar{},
-		&ToggleStatuseBar{},
+		&ToggleStatusBar{},
 		&ToggleFullScreen{},
-		&ToggleDsitractionFree{},
+		&ToggleDistractionFree{},
 	})
 }
