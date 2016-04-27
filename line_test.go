@@ -57,7 +57,7 @@ func TestJoinLines(t *testing.T) {
 		v.Sel().Clear()
 		v.Sel().AddAll(test.sel)
 
-		ed.CommandHandler().RunTextCommand(v, "join", nil)
+		ed.CommandHandler().RunTextCommand(v, "join_lines", nil)
 		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
 			t.Errorf("Test %d:\nExcepted: '%s'\nbut got: '%s'", i, test.expect, d)
 		}
@@ -146,11 +146,13 @@ func TestSelectLines(t *testing.T) {
 }
 
 func TestSwapLine(t *testing.T) {
-	uptests := []struct {
+	type SwapLineTest struct {
 		text   string
 		sel    []Region
 		expect string
-	}{
+	}
+
+	uptests := []SwapLineTest{
 		{
 			"a\nb",
 			[]Region{{2, 2}},

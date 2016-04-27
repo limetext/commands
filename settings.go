@@ -55,26 +55,26 @@ func (c *SetSetting) Run(v *View, e *Edit) error {
 }
 
 func (c *ToggleSideBar) Run(w *Window) error {
-	res, ok := v.Settings().Get(setting, false).(bool)
-	v.Settings().Set(setting, !ok || !res)
+	res, ok := w.Settings().Get("toggle_sidebar", false).(bool)
+	w.Settings().Set("toggle_sidebar", !ok || !res)
 	return nil
 }
 
 func (c *ToggleStatuseBar) Run(w *Window) error {
-	res, ok := v.Settings().Get(setting, false).(bool)
-	v.Settings().Set(setting, !ok || !res)
+	res, ok := w.Settings().Get("toggle_status_bar", false).(bool)
+	w.Settings().Set("toggle_status_bar", !ok || !res)
 	return nil
 }
 
 func (c *ToggleFullScreen) Run(w *Window) error {
-	res, ok := v.Settings().Get(setting, false).(bool)
-	v.Settings().Set(setting, !ok || !res)
+	res, ok := w.Settings().Get("toggle_full_screen", false).(bool)
+	w.Settings().Set("toggle_fullscreen", !ok || !res)
 	return nil
 }
 
 func (c *ToggleDsitractionFree) Run(w *Window) error {
-	res, ok := v.Settings().Get(setting, false).(bool)
-	v.Settings().Set(setting, !ok || !res)
+	res, ok := w.Settings().Get("toggle_distraction_free", false).(bool)
+	w.Settings().Set("toggle_distraction_free", !ok || !res)
 	return nil
 }
 
