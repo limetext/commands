@@ -4,9 +4,7 @@
 
 package commands
 
-import (
-	. "github.com/limetext/backend"
-)
+import . "github.com/limetext/backend"
 
 type (
 	// The ToggleSettingCommand toggles the value of a setting,
@@ -24,21 +22,36 @@ type (
 	}
 
 	ToggleSideBar struct {
-		BypassUndoCommand
+		toggleSetting
 	}
 
 	ToggleStatusBar struct {
-		BypassUndoCommand
+		toggleSetting
 	}
 
 	ToggleFullScreen struct {
-		BypassUndoCommand
+		toggleSetting
 	}
 
 	ToggleDistractionFree struct {
-		BypassUndoCommand
+		toggleSetting
+	}
+
+	ToggleMinimap struct {
+		toggleSetting
+	}
+
+	ToggleTabs struct {
+		toggleSetting
 	}
 )
+
+// helper struct for commands that just toggle a simple setting
+type toggleSetting struct {
+	// the setting name which we are going to toggle
+	name string
+	BypassUndoCommand
+}
 
 func (c *ToggleSetting) Run(v *View, e *Edit) error {
 	setting := c.Setting
@@ -54,37 +67,25 @@ func (c *SetSetting) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *ToggleSideBar) Run(w *Window) error {
-	res, ok := w.Settings().Get("toggle_sidebar", false).(bool)
-	w.Settings().Set("toggle_sidebar", !ok || !res)
+func (t *toggleSetting) Run(w *Window) error {
+	res, ok := w.Settings().Get(t.name, false).(bool)
+	w.Settings().Set(t.name, !ok || !res)
 	return nil
 }
 
-func (c *ToggleStatusBar) Run(w *Window) error {
-	res, ok := w.Settings().Get("toggle_status_bar", false).(bool)
-	w.Settings().Set("toggle_status_bar", !ok || !res)
-	return nil
-}
-
-func (c *ToggleFullScreen) Run(w *Window) error {
-	res, ok := w.Settings().Get("toggle_full_screen", false).(bool)
-	w.Settings().Set("toggle_fullscreen", !ok || !res)
-	return nil
-}
-
-func (c *ToggleDistractionFree) Run(w *Window) error {
-	res, ok := w.Settings().Get("toggle_distraction_free", false).(bool)
-	w.Settings().Set("toggle_distraction_free", !ok || !res)
-	return nil
+func toggle(name string) toggleSetting {
+	return toggleSetting{name: name}
 }
 
 func init() {
 	register([]Command{
 		&ToggleSetting{},
 		&SetSetting{},
-		&ToggleSideBar{},
-		&ToggleStatusBar{},
-		&ToggleFullScreen{},
-		&ToggleDistractionFree{},
+		&ToggleSideBar{toggle("show_side_bar")},
+		&ToggleStatusBar{toggle("show_status_bar")},
+		&ToggleFullScreen{toggle("show_full_screen")},
+		&ToggleDistractionFree{toggle("show_distraction_free")},
+		&ToggleMinimap{toggle("show_minimap")},
+		&ToggleTabs{toggle("show_tabs")},
 	})
 }

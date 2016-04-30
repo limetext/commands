@@ -5,6 +5,7 @@
 package commands
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/limetext/backend"
@@ -18,7 +19,6 @@ func TestToggleSetting(t *testing.T) {
 	v := w.NewFile()
 	defer func() {
 		v.SetScratch(true)
-		v.Close()
 	}()
 
 	v.Settings().Set("duck", true)
@@ -58,7 +58,6 @@ func TestSetSetting(t *testing.T) {
 	v := w.NewFile()
 	defer func() {
 		v.SetScratch(true)
-		v.Close()
 	}()
 
 	v.Settings().Set("favorite_color", "blue")
@@ -68,5 +67,28 @@ func TestSetSetting(t *testing.T) {
 	val := v.Settings().Get("favorite_color")
 	if s, ok := val.(string); !ok || s != exp {
 		t.Errorf("Expecting setting value to be %#v, was %#v", exp, val)
+	}
+}
+
+func TestToggles(t *testing.T) {
+	names := []string{"show_side_bar", "show_status_bar", "show_tabs",
+		"show_full_screen", "show_distraction_free", "show_minimap"}
+	for _, name := range names {
+		toggleTest(t, name)
+	}
+}
+
+func toggleTest(t *testing.T, name string) {
+	ed := GetEditor()
+	w := ed.NewWindow()
+	defer w.Close()
+
+	cmd := strings.Replace(name, "show", "toggle", -1)
+
+	cur := w.Settings().Get(name, false).(bool)
+	ed.CommandHandler().RunWindowCommand(w, cmd, nil)
+	if got, exp := w.Settings().Get(name, false).(bool), !cur; got != exp {
+		t.Errorf("Expected %s setting after running %s command be %t, but got %t",
+			name, cmd, exp, got)
 	}
 }
