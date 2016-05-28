@@ -288,11 +288,25 @@ func (c *Move) Run(v *View, e *Edit) error {
 	case Lines:
 		move_action(v, c.Extend, func(in text.Region) int {
 			r, col := v.RowCol(in.B)
+			fromLine := v.Line(v.TextPoint(r, 0))
 			if !c.Forward {
 				r--
 			} else {
 				r++
 			}
+			// the line we are moving to
+			toLine := v.Line(v.TextPoint(r, 0))
+			// If there is tabs in the line, buffer counts them as
+			// 1 character but we need to count them as tab_size
+			// from settings
+			size := 4
+			if ts, ok := v.Settings().Get("tab_size", 4).(int); ok {
+				size = ts
+			}
+			toTabs := strings.Count(v.Substr(toLine), "\t")
+			fromTabs := strings.Count(v.Substr(fromLine), "\t")
+			col += (fromTabs - toTabs) * (size - 1)
+
 			return v.TextPoint(r, col)
 		})
 	case Words:

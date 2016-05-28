@@ -379,18 +379,26 @@ func TestMoveByStops(t *testing.T) {
 	runMoveTest(tests, t, "Hello WorLd!\nTest12312{\n\n3Stop (testing) tada}\n Abr_akad[abra")
 }
 
-func TestMoveIss2(t *testing.T) {
+func TestMoveWhenWeHaveTabs(t *testing.T) {
 	tests := []MoveTest{
 		{
-			[]Region{{33, 33}},
+			[]Region{{35, 35}},
 			"lines",
 			false,
 			false,
-			[]Region{{10, 10}},
+			[]Region{{11, 11}},
+			nil,
+		},
+		{
+			[]Region{{11, 11}},
+			"lines",
+			false,
+			true,
+			[]Region{{35, 35}},
 			nil,
 		},
 	}
-	runMoveTest(tests, t, "type qmlfrontend struct {\n\tstatus_message string")
+	runMoveTest(tests, t, "\ttype qmlfrontend struct {\n\t\tstatus_message string")
 }
 
 type MoveToTest struct {
