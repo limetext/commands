@@ -249,10 +249,7 @@ func (m *MoveByType) Set(v interface{}) error {
 }
 
 func (c *Move) Run(v *View, e *Edit) error {
-	p := util.Prof.Enter("move.run.init")
-
-	p.Exit()
-	p = util.Prof.Enter("move.run.action")
+	p := util.Prof.Enter("move.run.action")
 	defer p.Exit()
 
 	switch c.By {
@@ -291,7 +288,6 @@ func (c *Move) Run(v *View, e *Edit) error {
 	case Lines:
 		move_action(v, c.Extend, func(in text.Region) int {
 			r, col := v.RowCol(in.B)
-			_ = r
 			if !c.Forward {
 				r--
 			} else {
