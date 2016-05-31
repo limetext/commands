@@ -13,38 +13,6 @@ import (
 	"github.com/limetext/util"
 )
 
-const (
-	// Beginning of line
-	BOL MoveToType = iota
-	// End of line
-	EOL
-	// Beginning of file
-	BOF
-	// End of file
-	EOF
-	// Current level close bracket
-	Brackets
-)
-
-const (
-	// Move by Characters
-	Characters MoveByType = iota
-	// Move by Stops (TODO(.): what exactly is a stop?)
-	Stops
-	// Move by Lines
-	Lines
-	// Move by Words
-	Words
-	// Move by Word Ends
-	WordEnds
-	// Move by Sub Words
-	SubWords
-	// Move by Sub Word Ends
-	SubWordEnds
-	// Move by Page
-	Pages
-)
-
 type (
 	// The MoveCommand moves the current selection
 	Move struct {
@@ -92,6 +60,38 @@ type (
 		// The number of lines to scroll (positive or negative direction)
 		Amount int
 	}
+)
+
+const (
+	// Beginning of line
+	BOL MoveToType = iota
+	// End of line
+	EOL
+	// Beginning of file
+	BOF
+	// End of file
+	EOF
+	// Current level close bracket
+	Brackets
+)
+
+const (
+	// Move by Characters
+	Characters MoveByType = iota
+	// Move by Stops (TODO(.): what exactly is a stop?)
+	Stops
+	// Move by Lines
+	Lines
+	// Move by Words
+	Words
+	// Move by Word Ends
+	WordEnds
+	// Move by Sub Words
+	SubWords
+	// Move by Sub Word Ends
+	SubWordEnds
+	// Move by Page
+	Pages
 )
 
 func move_action(v *View, extend bool, transform func(r text.Region) int) {
@@ -254,11 +254,11 @@ func (c *Move) Run(v *View, e *Edit) error {
 
 	switch c.By {
 	case Characters:
-		dir := 1
-		if !c.Forward {
-			dir = -1
-		}
 		move_action(v, c.Extend, func(r text.Region) int {
+			dir := 1
+			if !c.Forward {
+				dir = -1
+			}
 			return r.B + dir
 		})
 	case Stops:
