@@ -15,11 +15,6 @@ type (
 		DefaultCommand
 	}
 
-	SaveAs struct {
-		DefaultCommand
-		Name string
-	}
-
 	SaveAll struct {
 		DefaultCommand
 	}
@@ -29,15 +24,6 @@ func (c *Save) Run(v *View, e *Edit) error {
 	err := v.Save()
 	if err != nil {
 		GetEditor().Frontend().ErrorMessage(fmt.Sprintf("Failed to save %s:n%s", v.FileName(), err))
-		return err
-	}
-	return nil
-}
-
-func (c *SaveAs) Run(v *View, e *Edit) error {
-	err := v.SaveAs(c.Name)
-	if err != nil {
-		GetEditor().Frontend().ErrorMessage(fmt.Sprintf("Failed to save as %s:n%s", c.Name, err))
 		return err
 	}
 	return nil
@@ -56,7 +42,6 @@ func (c *SaveAll) Run(w *Window) error {
 func init() {
 	register([]Command{
 		&Save{},
-		&SaveAs{},
 		&SaveAll{},
 	})
 }

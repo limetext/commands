@@ -5,6 +5,10 @@
 package commands
 
 import (
+	"os"
+	"os/user"
+	"path"
+
 	. "github.com/limetext/backend"
 )
 
@@ -13,9 +17,8 @@ type (
 		DefaultCommand
 	}
 
-	OpenFile struct {
+	PromptOpenFile struct {
 		DefaultCommand
-		Path string
 	}
 )
 
@@ -25,14 +28,28 @@ func (c *NewFile) Run(w *Window) error {
 	return nil
 }
 
-func (o *OpenFile) Run(w *Window) error {
-	w.OpenFile(o.Path, 0)
+func (o *PromptOpenFile) Run(w *Window) error {
+	dir := "/"
+	if v := w.ActiveView(); v != nil {
+		p := path.Dir(v.FileName())
+		if _, err := os.Stat(p); err == nil {
+			dir = p
+		} else if usr, err := user.Current(); err != nil {
+			dir = usr.HomeDir
+		}
+	}
+
+	fe := GetEditor().Frontend()
+	files := fe.Prompt("Open file", dir)
+	for _, file := range files {
+		w.OpenFile(file, 0)
+	}
 	return nil
 }
 
 func init() {
 	register([]Command{
 		&NewFile{},
-		&OpenFile{},
+		&PromptOpenFile{},
 	})
 }

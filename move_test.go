@@ -406,6 +406,7 @@ func TestMoveWhenWeHaveTabs(t *testing.T) {
 type scfe struct {
 	show          Region
 	defaultAction bool
+	files         []string
 }
 
 func (f *scfe) StatusMessage(msg string) {}
@@ -415,19 +416,19 @@ func (f *scfe) MessageDialog(msg string) {}
 func (f *scfe) SetDefaultAction(action bool) {
 	f.defaultAction = action
 }
-
 func (f *scfe) OkCancelDialog(msg string, button string) bool {
 	return f.defaultAction
 }
-
 func (f *scfe) VisibleRegion(v *View) Region {
 	s := v.Line(v.TextPoint(3*3, 1))
 	e := v.Line(v.TextPoint(6*3, 1))
 	return Region{s.Begin(), e.End()}
 }
-
 func (f *scfe) Show(v *View, r Region) {
 	f.show = r
+}
+func (f *scfe) Prompt(title, dir string) []string {
+	return f.files
 }
 
 func TestScrollLines(t *testing.T) {
