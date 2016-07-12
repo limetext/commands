@@ -427,7 +427,7 @@ func (f *scfe) VisibleRegion(v *View) Region {
 func (f *scfe) Show(v *View, r Region) {
 	f.show = r
 }
-func (f *scfe) Prompt(title, dir string) []string {
+func (f *scfe) Prompt(title, dir string, flags int) []string {
 	return f.files
 }
 
