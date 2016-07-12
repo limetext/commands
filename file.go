@@ -39,16 +39,16 @@ func (o *PromptOpenFile) Run(w *Window) error {
 }
 
 func viewDirectory(v *View) string {
-	dir := "/"
-	if v != nil {
+	if v != nil && v.FileName() != "" {
 		p := path.Dir(v.FileName())
 		if _, err := os.Stat(p); err == nil {
-			dir = p
-		} else if usr, err := user.Current(); err != nil {
-			dir = usr.HomeDir
+			return p
 		}
 	}
-	return dir
+	if usr, err := user.Current(); err == nil {
+		return usr.HomeDir
+	}
+	return "/"
 }
 
 func init() {
