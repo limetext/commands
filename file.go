@@ -29,8 +29,18 @@ func (c *NewFile) Run(w *Window) error {
 }
 
 func (o *PromptOpenFile) Run(w *Window) error {
+	dir := viewDirectory(w.ActiveView())
+	fe := GetEditor().Frontend()
+	files := fe.Prompt("Open file", dir, PROMPT_SELECT_MULTIPLE)
+	for _, file := range files {
+		w.OpenFile(file, 0)
+	}
+	return nil
+}
+
+func viewDirectory(v *View) string {
 	dir := "/"
-	if v := w.ActiveView(); v != nil {
+	if v != nil {
 		p := path.Dir(v.FileName())
 		if _, err := os.Stat(p); err == nil {
 			dir = p
@@ -38,13 +48,7 @@ func (o *PromptOpenFile) Run(w *Window) error {
 			dir = usr.HomeDir
 		}
 	}
-
-	fe := GetEditor().Frontend()
-	files := fe.Prompt("Open file", dir, SelectMultiple)
-	for _, file := range files {
-		w.OpenFile(file, 0)
-	}
-	return nil
+	return dir
 }
 
 func init() {

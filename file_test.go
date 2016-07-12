@@ -33,17 +33,16 @@ func TestNewFile(t *testing.T) {
 
 func TestOpenFile(t *testing.T) {
 	var fe scfe
+	const testPath = "open_file_test.go"
+	fe.files = []string{testPath}
+
 	ed := GetEditor()
 	ed.SetFrontend(&fe)
 	w := ed.NewWindow()
 	defer w.Close()
 
 	l := len(w.Views())
-
-	const testPath = "open_file_test.go"
-	fe.files = []string{testPath}
 	ed.CommandHandler().RunWindowCommand(w, "prompt_open_file", nil)
-
 	if len(w.Views()) != l+1 {
 		t.Fatalf("Expected %d views, but got %d", l+1, len(w.Views()))
 	}
@@ -53,10 +52,5 @@ func TestOpenFile(t *testing.T) {
 	}
 	if w.Views()[l].FileName() != exp {
 		t.Errorf("Expected %s as FileName, but got %s", testPath, w.Views()[l].FileName())
-	}
-
-	for _, v := range w.Views() {
-		v.SetScratch(true)
-		v.Close()
 	}
 }

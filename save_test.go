@@ -6,6 +6,7 @@ package commands
 
 import (
 	"io/ioutil"
+	"os"
 	"testing"
 
 	. "github.com/limetext/backend"
@@ -52,19 +53,53 @@ func TestSave(t *testing.T) {
 		v.EndEdit(e)
 
 		ed.CommandHandler().RunTextCommand(v, "save", nil)
-		if v.IsDirty() {
-			t.Errorf("Test %d: Expected the view to be clean, but it wasn't", i)
-		}
-
 		if data, _ := ioutil.ReadFile(testfile); test.expect != string(data) {
 			t.Errorf("Test %d: Expected %s, but got %s", i, test.expect, string(data))
 		}
 
 		v.Close()
-
 		if err := ioutil.WriteFile(testfile, hold, 0644); err != nil {
 			t.Fatalf("Couldn't write back test file %s", testfile)
 		}
+	}
+}
+
+func TestSaveAs(t *testing.T) {
+	hold, err := ioutil.ReadFile(testfile)
+	if err != nil {
+		t.Fatalf("Couldn't read test file %s", testfile)
+	}
+	if err := ioutil.WriteFile(testfile, []byte(""), 0644); err != nil {
+		t.Fatalf("Couldn't write test file %s", testfile)
+	}
+
+	var fe scfe
+	const name = "testdata/save_as_test.txt"
+	fe.files = []string{name}
+
+	ed := GetEditor()
+	ed.SetFrontend(&fe)
+	w := ed.NewWindow()
+	defer w.Close()
+
+	v := w.OpenFile(testfile, 0)
+	e := v.BeginEdit()
+	v.Insert(e, 0, "Testing save_as ")
+	v.BeginEdit()
+
+	ed.CommandHandler().RunTextCommand(v, "prompt_save_as", nil)
+	if _, err := os.Stat(name); os.IsNotExist(err) {
+		t.Errorf("The new test file %s wasn't created", name)
+	}
+	if data, _ := ioutil.ReadFile(name); "Testing save_as " != string(data) {
+		t.Errorf("Expected %s, but got %s", "Testing save_as ", string(data))
+	}
+
+	if err := os.Remove(name); err != nil {
+		t.Errorf("Couldn't remove test file %s", name)
+	}
+	if err := ioutil.WriteFile(testfile, hold, 0644); err != nil {
+		t.Fatalf("Couldn't write back test file %s", testfile)
 	}
 }
 
