@@ -40,7 +40,7 @@ func (o *PromptOpenFile) Run(w *Window) error {
 	}
 
 	fe := GetEditor().Frontend()
-	files := fe.Prompt("Open file", dir)
+	files := fe.Prompt("Open file", dir, SelectMultiple)
 	for _, file := range files {
 		w.OpenFile(file, 0)
 	}
