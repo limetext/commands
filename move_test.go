@@ -161,6 +161,22 @@ func TestMove(t *testing.T) {
 			nil,
 		},
 		{
+			[]Region{{12, 12}},
+			"lines",
+			false,
+			true,
+			[]Region{{23, 23}},
+			nil,
+		},
+		{
+			[]Region{{35, 35}},
+			"lines",
+			false,
+			false,
+			[]Region{{23, 23}},
+			nil,
+		},
+		{
 			[]Region{{1, 1}},
 			"words",
 			true,
