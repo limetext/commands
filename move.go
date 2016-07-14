@@ -307,6 +307,10 @@ func (c *Move) Run(v *View, e *Edit) error {
 			fromTabs := strings.Count(v.Substr(fromLine), "\t")
 			col += (fromTabs - toTabs) * (size - 1)
 
+			if col > toLine.Size() {
+				col = toLine.Size()
+			}
+
 			return v.TextPoint(r, col)
 		})
 	case Words:
