@@ -37,8 +37,11 @@ func (c *PromptSaveAs) Run(v *View, e *Edit) error {
 	dir := viewDirectory(v)
 	fe := GetEditor().Frontend()
 	files := fe.Prompt("Save file", dir, PROMPT_SAVE_AS)
-	name := files[0]
+	if len(files) == 0 {
+		return nil
+	}
 
+	name := files[0]
 	if err := v.SaveAs(name); err != nil {
 		fe.ErrorMessage(fmt.Sprintf("Failed to save as %s:%s", name, err))
 		return err

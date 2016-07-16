@@ -4,7 +4,7 @@ imports:
 - name: github.com/atotto/clipboard
   version: bb272b845f1112e10117e3e45ce39f690c0001ad
 - name: github.com/limetext/backend
-  version: 239b5e85078f75952c76d0257daaf00057906e0f
+  version: d4737f6e46aadfa93a5d365fc23f4b46ab0804e1
   subpackages:
   - log
   - keys
