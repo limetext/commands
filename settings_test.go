@@ -85,9 +85,9 @@ func toggleTest(t *testing.T, name string) {
 
 	cmd := strings.Replace(name, "show", "toggle", -1)
 
-	cur := w.Settings().Get(name, false).(bool)
+	cur := w.Settings().Bool(name, false)
 	ed.CommandHandler().RunWindowCommand(w, cmd, nil)
-	if got, exp := w.Settings().Get(name, false).(bool), !cur; got != exp {
+	if got, exp := w.Settings().Bool(name, false), !cur; got != exp {
 		t.Errorf("Expected %s setting after running %s command be %t, but got %t",
 			name, cmd, exp, got)
 	}

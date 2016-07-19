@@ -263,7 +263,7 @@ func (c *Move) Run(v *View, e *Edit) error {
 		})
 	case Stops:
 		move_action(v, c.Extend, func(in text.Region) int {
-			tmp := v.Settings().Get("word_separators", DEFAULT_SEPARATORS).(string)
+			tmp := v.Settings().String("word_separators", DEFAULT_SEPARATORS)
 			defer v.Settings().Set("word_separators", tmp)
 			v.Settings().Set("word_separators", c.Separators)
 
@@ -299,10 +299,7 @@ func (c *Move) Run(v *View, e *Edit) error {
 			// If there is tabs in the line, buffer counts them as
 			// 1 character but we need to count them as tab_size
 			// from settings
-			size := 4
-			if ts, ok := v.Settings().Get("tab_size", 4).(int); ok {
-				size = ts
-			}
+			size := v.Settings().Int("tab_size", 4)
 			toTabs := strings.Count(v.Substr(toLine), "\t")
 			fromTabs := strings.Count(v.Substr(fromLine), "\t")
 			col += (fromTabs - toTabs) * (size - 1)

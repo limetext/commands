@@ -25,8 +25,8 @@ type (
 
 func (c *Indent) Run(v *View, e *Edit) error {
 	indent := "\t"
-	if t, ok := v.Settings().Get("translate_tabs_to_spaces", false).(bool); ok && t {
-		indent = strings.Repeat(" ", getTabSize(v))
+	if t := v.Settings().Bool("translate_tabs_to_spaces", false); t {
+		indent = strings.Repeat(" ", v.Settings().Int("tab_size", 4))
 	}
 	sel := v.Sel()
 
@@ -44,7 +44,7 @@ func (c *Indent) Run(v *View, e *Edit) error {
 }
 
 func (c *Unindent) Run(v *View, e *Edit) error {
-	tab_size := getTabSize(v)
+	tab_size := v.Settings().Int("tab_size", 4)
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -74,15 +74,6 @@ func (c *Unindent) Run(v *View, e *Edit) error {
 		}
 	}
 	return nil
-}
-
-// Return the tab size from the settings, defaulting to 4 if not found.
-func getTabSize(v *View) int {
-	tab_size := 4
-	if t, ok := v.Settings().Get("tab_size", tab_size).(int); ok {
-		tab_size = t
-	}
-	return tab_size
 }
 
 func init() {

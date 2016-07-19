@@ -71,7 +71,7 @@ func nextSelection(v *View, search string) (Region, error) {
 	sel := v.Sel()
 	rs := sel.Regions()
 	last := 0
-	wrap, _ := v.Settings().Get("find_wrap").(bool)
+	wrap := v.Settings().Bool("find_wrap")
 
 	// Regions are not sorted, so finding the last one requires a search.
 	for _, r := range rs {

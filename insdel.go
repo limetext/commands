@@ -57,13 +57,10 @@ func (c *Insert) Run(v *View, e *Edit) error {
 func (c *LeftDelete) Run(v *View, e *Edit) error {
 	trim_space := false
 	tab_size := 4
-	if t, ok := v.Settings().Get("translate_tabs_to_spaces", false).(bool); ok && t {
-		if t, ok := v.Settings().Get("use_tab_stops", true).(bool); ok && t {
+	if t := v.Settings().Bool("translate_tabs_to_spaces", false); t {
+		if t = v.Settings().Bool("use_tab_stops", true); t {
 			trim_space = true
-			tab_size, ok = v.Settings().Get("tab_size", 4).(int)
-			if !ok {
-				tab_size = 4
-			}
+			tab_size = v.Settings().Int("tab_size", 4)
 		}
 	}
 
