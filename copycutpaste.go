@@ -37,7 +37,7 @@ func getRegions(v *View, cut bool) *text.RegionSet {
 		if ae && r.Empty() {
 			rs.Add(v.FullLineR(r))
 		} else if he && r.Empty() {
-			rs.Substract(r)
+			rs.Subtract(r)
 		}
 	}
 
