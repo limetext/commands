@@ -33,7 +33,7 @@ func TestNewFile(t *testing.T) {
 
 func TestOpenFile(t *testing.T) {
 	var fe scfe
-	const testPath = "open_file_test.go"
+	const testPath = "file_test.go"
 	fe.files = []string{testPath}
 
 	ed := GetEditor()
