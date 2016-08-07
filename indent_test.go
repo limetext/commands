@@ -39,8 +39,14 @@ func runIndentTest(t *testing.T, tests []indentTest, command string) {
 		for _, r := range test.sel {
 			v.Sel().Add(r)
 		}
-		v.Settings().Set("translate_tabs_to_spaces", test.translate_tabs_to_spaces)
-		v.Settings().Set("tab_size", test.tab_size)
+
+		if val, ok := test.translate_tabs_to_spaces.(bool); ok {
+			v.Settings().Set("translate_tabs_to_spaces", val)
+		}
+
+		if val, ok := test.tab_size.(int); ok {
+			v.Settings().Set("tab_size", val)
+		}
 
 		ed.CommandHandler().RunTextCommand(v, command, nil)
 		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
