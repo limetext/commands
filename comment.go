@@ -8,19 +8,25 @@ import (
 	"strings"
 	"unicode"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 type (
+	// ToggleComment toggles the comment status for the current selection.
+	// If the current selection has any content which is not currently contained within a comment, the
+	// entire selection is commented out, with existing comments being commented by an extra level.
+	// If the current selection has only content contained within comments, all of the comments are
+	// reduced by one level. All lines containing only whitespace are ignored in every case.
 	ToggleComment struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *ToggleComment) Run(v *View, e *Edit) error {
+// Run executes the ToggleComment command.
+func (c *ToggleComment) Run(v *backend.View, e *backend.Edit) error {
 	// TODO: Comment the line if we only have a cursor.
 	// TODO: Expand the selection after altering it.
-	// TODO: Align the comment characters for multiline selections.
+	// TODO: Align the comment characters for multiline selection.
 	// TODO: Get the comment value from the Textmate files.
 	comm := "//"
 
@@ -48,7 +54,7 @@ func (c *ToggleComment) Run(v *View, e *Edit) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&ToggleComment{},
 	})
 }

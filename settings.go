@@ -4,31 +4,36 @@
 
 package commands
 
-import . "github.com/limetext/backend"
+import "github.com/limetext/backend"
 
 type (
-	// The ToggleSettingCommand toggles the value of a setting,
+	// ToggleSetting Command toggles the value of a setting,
 	// making it false when it was true or true when it was false.
 	ToggleSetting struct {
-		BypassUndoCommand
+		backend.BypassUndoCommand
 		Setting string
 	}
 
-	// The SetSettingCommand set the value of a setting.
+	// SetSetting Command set the value of a setting.
 	SetSetting struct {
-		BypassUndoCommand
+		backend.BypassUndoCommand
 		Setting string
 		Value   interface{}
 	}
 
+	// ToggleSideBar Command enables us to toggle the sidebar
+	// when the sidebar is visible, it'll be made invisible
+	// and vice versa.
 	ToggleSideBar struct {
 		toggleSetting
 	}
 
+	// ToggleStatusBar command enables us to toggle the status bar.
 	ToggleStatusBar struct {
 		toggleSetting
 	}
 
+	// ToggleFullScreen command enables us to toggle full screen.
 	ToggleFullScreen struct {
 		toggleSetting
 	}
@@ -46,14 +51,15 @@ type (
 	}
 )
 
-// helper struct for commands that just toggle a simple setting
+// helper struct for commands that just toggle a simple setting.
 type toggleSetting struct {
-	// the setting name which we are going to toggle
+	// the setting name which we are going to toggle.
 	name string
-	BypassUndoCommand
+	backend.BypassUndoCommand
 }
 
-func (c *ToggleSetting) Run(v *View, e *Edit) error {
+// Run executes the ToggleSetting command.
+func (c *ToggleSetting) Run(v *backend.View, e *backend.Edit) error {
 	setting := c.Setting
 	prev, boolean := v.Settings().Get(setting, false).(bool)
 	// if the setting was non-boolean, it is set to true, else it is toggled
@@ -61,13 +67,14 @@ func (c *ToggleSetting) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SetSetting) Run(v *View, e *Edit) error {
+// Run executes the SetSetting command.
+func (c *SetSetting) Run(v *backend.View, e *backend.Edit) error {
 	setting := c.Setting
 	v.Settings().Set(setting, c.Value)
 	return nil
 }
 
-func (t *toggleSetting) Run(w *Window) error {
+func (t *toggleSetting) Run(w *backend.Window) error {
 	res, ok := w.Settings().Get(t.name, false).(bool)
 	w.Settings().Set(t.name, !ok || !res)
 	return nil
@@ -78,7 +85,7 @@ func toggle(name string) toggleSetting {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&ToggleSetting{},
 		&SetSetting{},
 		&ToggleSideBar{toggle("show_side_bar")},

@@ -7,39 +7,39 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 func TestJoinLines(t *testing.T) {
 	tests := []struct {
 		text   string
-		sel    []Region
+		sel    []text.Region
 		expect string
 	}{
 		{
 			"a\n\t  bc",
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"a bc",
 		},
 		{
 			"abc\r\n\tde",
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			"abc de",
 		},
 		{
 			"testing \t\t\n join",
-			[]Region{{9, 8}},
+			[]text.Region{{9, 8}},
 			"testing join",
 		},
 		{
 			"test\n join\n command\n whith\n multiple\n regions",
-			[]Region{{2, 17}, {34, 40}},
+			[]text.Region{{2, 17}, {34, 40}},
 			"test join command whith\n multiple regions",
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -58,7 +58,7 @@ func TestJoinLines(t *testing.T) {
 		v.Sel().AddAll(test.sel)
 
 		ed.CommandHandler().RunTextCommand(v, "join_lines", nil)
-		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
+		if d := v.Substr(text.Region{0, v.Size()}); d != test.expect {
 			t.Errorf("Test %d:\nExcepted: '%s'\nbut got: '%s'", i, test.expect, d)
 		}
 	}
@@ -67,43 +67,43 @@ func TestJoinLines(t *testing.T) {
 func TestSelectLines(t *testing.T) {
 	tests := []struct {
 		text    string
-		sel     []Region
+		sel     []text.Region
 		forward bool
-		expect  []Region
+		expect  []text.Region
 	}{
 		{
 			"abc\ndefg",
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			true,
-			[]Region{{1, 1}, {5, 5}},
+			[]text.Region{{1, 1}, {5, 5}},
 		},
 		{
 			"abcde\nfg",
-			[]Region{{4, 4}},
+			[]text.Region{{4, 4}},
 			true,
-			[]Region{{4, 4}, {8, 8}},
+			[]text.Region{{4, 4}, {8, 8}},
 		},
 		{
 			"Testing select lines command\nin\nlime text",
-			[]Region{{8, 14}, {30, 30}},
+			[]text.Region{{8, 14}, {30, 30}},
 			true,
-			[]Region{{8, 14}, {30, 30}, {31, 31}, {33, 33}},
+			[]text.Region{{8, 14}, {30, 30}, {31, 31}, {33, 33}},
 		},
 		{
 			"abc\n\ndefg",
-			[]Region{{6, 6}},
+			[]text.Region{{6, 6}},
 			false,
-			[]Region{{6, 6}, {4, 4}},
+			[]text.Region{{6, 6}, {4, 4}},
 		},
 		{
 			"Testing select lines command\nin\nlime text",
-			[]Region{{30, 36}, {29, 29}},
+			[]text.Region{{30, 36}, {29, 29}},
 			false,
-			[]Region{{30, 36}, {29, 29}, {0, 0}, {1, 1}},
+			[]text.Region{{30, 36}, {29, 29}, {0, 0}, {1, 1}},
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -121,7 +121,7 @@ func TestSelectLines(t *testing.T) {
 		v.Sel().Clear()
 		v.Sel().AddAll(test.sel)
 
-		ed.CommandHandler().RunTextCommand(v, "select_lines", Args{"forward": test.forward})
+		ed.CommandHandler().RunTextCommand(v, "select_lines", backend.Args{"forward": test.forward})
 		// Comparing regions
 		d := v.Sel()
 		if d.Len() != len(test.expect) {
@@ -148,19 +148,19 @@ func TestSelectLines(t *testing.T) {
 func TestSwapLine(t *testing.T) {
 	type SwapLineTest struct {
 		text   string
-		sel    []Region
+		sel    []text.Region
 		expect string
 	}
 
 	uptests := []SwapLineTest{
 		{
 			"a\nb",
-			[]Region{{2, 2}},
+			[]text.Region{{2, 2}},
 			"b\na",
 		},
 		{
 			"Testing swap line up\ncommand whit multiple\nregions selected\nTesting swap line up\ncommand whit multiple\nregions selected",
-			[]Region{{25, 53}, {86, 95}},
+			[]text.Region{{25, 53}, {86, 95}},
 			"command whit multiple\nregions selected\nTesting swap line up\ncommand whit multiple\nTesting swap line up\nregions selected",
 		},
 	}
@@ -168,17 +168,17 @@ func TestSwapLine(t *testing.T) {
 	dwtests := []SwapLineTest{
 		{
 			"a\nb",
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"b\na",
 		},
 		{
 			"Testing swap line up\ncommand whit multiple\nregions selected\nTesting swap line up\ncommand whit multiple\nregions selected",
-			[]Region{{25, 53}, {86, 95}},
+			[]text.Region{{25, 53}, {86, 95}},
 			"Testing swap line up\nTesting swap line up\ncommand whit multiple\nregions selected\nregions selected\ncommand whit multiple",
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -197,7 +197,7 @@ func TestSwapLine(t *testing.T) {
 		v.Sel().AddAll(test.sel)
 
 		ed.CommandHandler().RunTextCommand(v, "swap_line_up", nil)
-		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
+		if d := v.Substr(text.Region{0, v.Size()}); d != test.expect {
 			t.Errorf("Test %d:\nExcepted: '%s'\nbut got: '%s'", i, test.expect, d)
 		}
 	}
@@ -217,7 +217,7 @@ func TestSwapLine(t *testing.T) {
 		v.Sel().AddAll(test.sel)
 
 		ed.CommandHandler().RunTextCommand(v, "swap_line_down", nil)
-		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
+		if d := v.Substr(text.Region{0, v.Size()}); d != test.expect {
 			t.Errorf("Test %d:\nExcepted: '%s'\nbut got: '%s'", i, test.expect, d)
 		}
 	}
@@ -226,27 +226,27 @@ func TestSwapLine(t *testing.T) {
 func TestSplitToLines(t *testing.T) {
 	tests := []struct {
 		text   string
-		sel    []Region
-		expect []Region
+		sel    []text.Region
+		expect []text.Region
 	}{
 		{
 			"ab\ncd\nef",
-			[]Region{{4, 7}},
-			[]Region{{4, 5}, {6, 7}},
+			[]text.Region{{4, 7}},
+			[]text.Region{{4, 5}, {6, 7}},
 		},
 		{
 			"ab\ncd\nef",
-			[]Region{{0, 8}},
-			[]Region{{0, 2}, {3, 5}, {6, 8}},
+			[]text.Region{{0, 8}},
+			[]text.Region{{0, 2}, {3, 5}, {6, 8}},
 		},
 		{
 			"ab\ncd\nef",
-			[]Region{{0, 4}, {4, 7}},
-			[]Region{{0, 2}, {3, 4}, {4, 5}, {6, 7}},
+			[]text.Region{{0, 4}, {4, 7}},
+			[]text.Region{{0, 2}, {3, 4}, {4, 5}, {6, 7}},
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 

@@ -7,11 +7,11 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 func TestClose(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 
 	l := len(ed.Windows())
 	w := ed.NewWindow()
@@ -36,7 +36,7 @@ func TestClose(t *testing.T) {
 }
 
 func TestNextView(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -84,7 +84,7 @@ func TestNextView(t *testing.T) {
 }
 
 func TestPrevView(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 

@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 func TestSaveProjectAs(t *testing.T) {
@@ -17,7 +17,7 @@ func TestSaveProjectAs(t *testing.T) {
 
 	var fe scfe
 	fe.files = []string{testfile}
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
 	w := ed.NewWindow()
 	defer w.Close()
@@ -35,7 +35,7 @@ func TestPromptAddFolder(t *testing.T) {
 	var fe scfe
 	fe.files = []string{testfolder}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
 	w := ed.NewWindow()
 	defer w.Close()
@@ -53,7 +53,7 @@ func TestPromptAddFolder(t *testing.T) {
 }
 
 func TestCloseFolderList(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 	p := w.Project()
@@ -64,6 +64,6 @@ func TestCloseFolderList(t *testing.T) {
 		t.Errorf("Error running 'close_folder_list' command: %s", err)
 	}
 	if len(p.Folders()) != 0 {
-		t.Error("Expected project folders list be empty, but got %s", p.Folders())
+		t.Errorf("Expected project folders list be empty, but got %s", p.Folders())
 	}
 }

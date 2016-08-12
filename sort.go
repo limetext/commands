@@ -8,34 +8,34 @@ import (
 	"sort"
 	"strings"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type (
-	// The SortLinesCommand sorts all lines
-	// intersecting a selection region
+	// SortLines Command sorts all lines
+	// intersecting a selection region.
 	SortLines struct {
-		DefaultCommand
+		backend.DefaultCommand
 		CaseSensitive    bool
 		Reverse          bool
 		RemoveDuplicates bool
 	}
 
-	// The SortSelectionCommand sorts contents
+	// SortSelection Command sorts contents
 	// of each selection region with respect to
-	// each other
+	// each other.
 	SortSelection struct {
-		DefaultCommand
+		backend.DefaultCommand
 		CaseSensitive    bool
 		Reverse          bool
 		RemoveDuplicates bool
 	}
 
-	// Helper type to sort Regions by theirs positions
-	regionSorter []Region
+	// Helper type to sort Regions by theirs positions.
+	regionSorter []text.Region
 
-	// Helper struct to sort strings
+	// Helper struct to sort strings.
 	textSorter struct {
 		texts         []string
 		caseSensitive bool
@@ -72,18 +72,19 @@ func (s textSorter) Less(i, j int) bool {
 	return textA < textB
 }
 
-func (c *SortLines) Run(v *View, e *Edit) error {
+// Run executes the SortLines command.
+func (c *SortLines) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	// Used as a set of int
-	sorted_rows := make(map[int]bool)
+	sortedRows := make(map[int]bool)
 
-	regions := []Region{}
+	regions := []text.Region{}
 	texts := []string{}
 	for i := 0; i < sel.Len(); i++ {
 		// Get regions containing each line.
 		for _, r := range v.Lines(sel.Get(i)) {
-			if ok := sorted_rows[r.Begin()]; !ok {
-				sorted_rows[r.Begin()] = true
+			if ok := sortedRows[r.Begin()]; !ok {
+				sortedRows[r.Begin()] = true
 				regions = append(regions, r)
 				texts = append(texts, v.Substr(r))
 			}
@@ -103,7 +104,7 @@ func (c *SortLines) Run(v *View, e *Edit) error {
 
 	offset := 0
 	for i, r := range regions {
-		r = Region{r.A + offset, r.B + offset}
+		r = text.Region{r.A + offset, r.B + offset}
 		if i < len(texts) {
 			v.Replace(e, r, texts[i])
 			offset += len(texts[i]) - r.Size()
@@ -118,9 +119,10 @@ func (c *SortLines) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SortSelection) Run(v *View, e *Edit) error {
+// Run executes the sort slection command.
+func (c *SortSelection) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
-	regions := make([]Region, sel.Len())
+	regions := make([]text.Region, sel.Len())
 	texts := make([]string, sel.Len())
 	for i := 0; i < sel.Len(); i++ {
 		regions[i] = sel.Get(i)
@@ -140,7 +142,7 @@ func (c *SortSelection) Run(v *View, e *Edit) error {
 
 	offset := 0
 	for i, r := range regions {
-		r = Region{r.A + offset, r.B + offset}
+		r = text.Region{r.A + offset, r.B + offset}
 		if i < len(texts) {
 			v.Replace(e, r, texts[i])
 			offset += len(texts[i]) - r.Size()
@@ -153,7 +155,7 @@ func (c *SortSelection) Run(v *View, e *Edit) error {
 	return nil
 }
 
-// Remove duplicate ones from a sorted slice of string
+// Remove duplicate ones from a sorted slice of string.
 func removeDuplicates(caseSensitive bool, xs []string) []string {
 	var i, j int
 	for j < len(xs) {
@@ -181,7 +183,7 @@ func removeDuplicates(caseSensitive bool, xs []string) []string {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&SortLines{},
 		&SortSelection{},
 	})

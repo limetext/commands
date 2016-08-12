@@ -8,21 +8,21 @@ import (
 	"reflect"
 	"testing"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type MoveTest struct {
-	in      []Region
+	in      []text.Region
 	by      string
 	extend  bool
 	forward bool
-	exp     []Region
-	args    Args
+	exp     []text.Region
+	args    backend.Args
 }
 
 func runMoveTest(tests []MoveTest, t *testing.T, text string) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	v := w.NewFile()
 
@@ -40,7 +40,7 @@ func runMoveTest(tests []MoveTest, t *testing.T, text string) {
 		for _, r := range test.in {
 			v.Sel().Add(r)
 		}
-		args := Args{"by": test.by, "extend": test.extend, "forward": test.forward}
+		args := backend.Args{"by": test.by, "extend": test.extend, "forward": test.forward}
 		if test.args != nil {
 			for k, v := range test.args {
 				args[k] = v
@@ -54,373 +54,373 @@ func runMoveTest(tests []MoveTest, t *testing.T, text string) {
 }
 
 func TestMove(t *testing.T) {
-	text := "Hello World!\nTest123123\nAbrakadabra\n"
+	inpuText := "Hello World!\nTest123123\nAbrakadabra\n"
 	tests := []MoveTest{
 		{
-			[]Region{{1, 1}, {3, 3}, {6, 6}},
+			[]text.Region{{1, 1}, {3, 3}, {6, 6}},
 			"characters",
 			false,
 			true,
-			[]Region{{2, 2}, {4, 4}, {7, 7}},
+			[]text.Region{{2, 2}, {4, 4}, {7, 7}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}, {3, 3}, {6, 6}},
+			[]text.Region{{1, 1}, {3, 3}, {6, 6}},
 			"characters",
 			false,
 			false,
-			[]Region{{0, 0}, {2, 2}, {5, 5}},
+			[]text.Region{{0, 0}, {2, 2}, {5, 5}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}, {3, 3}, {10, 6}},
+			[]text.Region{{1, 1}, {3, 3}, {10, 6}},
 			"characters",
 			false,
 			true,
-			[]Region{{2, 2}, {4, 4}, {7, 7}},
+			[]text.Region{{2, 2}, {4, 4}, {7, 7}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}, {3, 3}, {10, 6}},
+			[]text.Region{{1, 1}, {3, 3}, {10, 6}},
 			"characters",
 			false,
 			false,
-			[]Region{{0, 0}, {2, 2}, {5, 5}},
+			[]text.Region{{0, 0}, {2, 2}, {5, 5}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}, {3, 3}, {10, 6}},
+			[]text.Region{{1, 1}, {3, 3}, {10, 6}},
 			"characters",
 			true,
 			true,
-			[]Region{{1, 2}, {3, 4}, {10, 7}},
+			[]text.Region{{1, 2}, {3, 4}, {10, 7}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}, {3, 3}, {10, 6}},
+			[]text.Region{{1, 1}, {3, 3}, {10, 6}},
 			"characters",
 			true,
 			false,
-			[]Region{{1, 0}, {3, 2}, {10, 5}},
+			[]text.Region{{1, 0}, {3, 2}, {10, 5}},
 			nil,
 		},
 		{
-			[]Region{{1, 3}, {3, 5}, {10, 7}},
+			[]text.Region{{1, 3}, {3, 5}, {10, 7}},
 			"characters",
 			true,
 			true,
-			[]Region{{1, 6}, {10, 8}},
+			[]text.Region{{1, 6}, {10, 8}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"stops",
 			true,
 			true,
-			[]Region{{1, 5}},
-			Args{"word_end": true},
+			[]text.Region{{1, 5}},
+			backend.Args{"word_end": true},
 		},
 		{
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"stops",
 			false,
 			true,
-			[]Region{{6, 6}},
-			Args{"word_begin": true},
+			[]text.Region{{6, 6}},
+			backend.Args{"word_begin": true},
 		},
 		{
-			[]Region{{6, 6}},
+			[]text.Region{{6, 6}},
 			"stops",
 			false,
 			false,
-			[]Region{{0, 0}},
-			Args{"word_begin": true},
+			[]text.Region{{0, 0}},
+			backend.Args{"word_begin": true},
 		},
 		{
-			[]Region{{34, 34}},
+			[]text.Region{{34, 34}},
 			"lines",
 			false,
 			false,
-			[]Region{{23, 23}},
+			[]text.Region{{23, 23}},
 			nil,
 		},
 		{
-			[]Region{{23, 23}},
+			[]text.Region{{23, 23}},
 			"lines",
 			false,
 			false,
-			[]Region{{10, 10}},
+			[]text.Region{{10, 10}},
 			nil,
 		},
 		{
-			[]Region{{100, 100}},
+			[]text.Region{{100, 100}},
 			"lines",
 			false,
 			false,
-			[]Region{{24, 24}},
+			[]text.Region{{24, 24}},
 			nil,
 		},
 		{
-			[]Region{{12, 12}},
+			[]text.Region{{12, 12}},
 			"lines",
 			false,
 			true,
-			[]Region{{23, 23}},
+			[]text.Region{{23, 23}},
 			nil,
 		},
 		{
-			[]Region{{35, 35}},
+			[]text.Region{{35, 35}},
 			"lines",
 			false,
 			false,
-			[]Region{{23, 23}},
+			[]text.Region{{23, 23}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"words",
 			true,
 			true,
-			[]Region{{1, 6}},
+			[]text.Region{{1, 6}},
 			nil,
 		},
 		{
-			[]Region{{5, 5}},
+			[]text.Region{{5, 5}},
 			"words",
 			false,
 			true,
-			[]Region{{6, 6}},
+			[]text.Region{{6, 6}},
 			nil,
 		},
 		{
-			[]Region{{6, 6}, {13, 15}},
+			[]text.Region{{6, 6}, {13, 15}},
 			"words",
 			false,
 			true,
-			[]Region{{12, 12}, {23, 23}},
+			[]text.Region{{12, 12}, {23, 23}},
 			nil,
 		},
 		{
-			[]Region{{13, 13}},
+			[]text.Region{{13, 13}},
 			"words",
 			false,
 			false,
-			[]Region{{12, 12}},
+			[]text.Region{{12, 12}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"word_ends",
 			true,
 			true,
-			[]Region{{1, 5}},
+			[]text.Region{{1, 5}},
 			nil,
 		},
 		{
-			[]Region{{5, 5}},
+			[]text.Region{{5, 5}},
 			"word_ends",
 			false,
 			true,
-			[]Region{{11, 11}},
+			[]text.Region{{11, 11}},
 			nil,
 		},
 		{
-			[]Region{{11, 11}, {13, 15}},
+			[]text.Region{{11, 11}, {13, 15}},
 			"word_ends",
 			false,
 			true,
-			[]Region{{12, 12}, {23, 23}},
+			[]text.Region{{12, 12}, {23, 23}},
 			nil,
 		},
 		{
-			[]Region{{13, 13}},
+			[]text.Region{{13, 13}},
 			"word_ends",
 			false,
 			false,
-			[]Region{{12, 12}},
+			[]text.Region{{12, 12}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"subwords",
 			true,
 			true,
-			[]Region{{1, 6}},
+			[]text.Region{{1, 6}},
 			nil,
 		},
 		{
-			[]Region{{5, 5}},
+			[]text.Region{{5, 5}},
 			"subwords",
 			false,
 			true,
-			[]Region{{6, 6}},
+			[]text.Region{{6, 6}},
 			nil,
 		},
 		{
-			[]Region{{6, 6}, {13, 15}},
+			[]text.Region{{6, 6}, {13, 15}},
 			"subwords",
 			false,
 			true,
-			[]Region{{11, 11}, {23, 23}},
+			[]text.Region{{11, 11}, {23, 23}},
 			nil,
 		},
 		{
-			[]Region{{13, 13}},
+			[]text.Region{{13, 13}},
 			"subwords",
 			false,
 			false,
-			[]Region{{12, 12}},
+			[]text.Region{{12, 12}},
 			nil,
 		},
 		{
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"subword_ends",
 			true,
 			true,
-			[]Region{{1, 5}},
+			[]text.Region{{1, 5}},
 			nil,
 		},
 		{
-			[]Region{{5, 5}},
+			[]text.Region{{5, 5}},
 			"subword_ends",
 			false,
 			true,
-			[]Region{{6, 6}},
+			[]text.Region{{6, 6}},
 			nil,
 		},
 		{
-			[]Region{{6, 6}, {13, 15}},
+			[]text.Region{{6, 6}, {13, 15}},
 			"subword_ends",
 			false,
 			true,
-			[]Region{{11, 11}, {23, 23}},
+			[]text.Region{{11, 11}, {23, 23}},
 			nil,
 		},
 		{
-			[]Region{{13, 13}},
+			[]text.Region{{13, 13}},
 			"subword_ends",
 			false,
 			false,
-			[]Region{{12, 12}},
+			[]text.Region{{12, 12}},
 			nil,
 		},
 		// Try moving outside the buffer
 		{
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			"lines",
 			false,
 			false,
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			nil,
 		},
 		{
-			[]Region{{36, 36}},
+			[]text.Region{{36, 36}},
 			"lines",
 			false,
 			true,
-			[]Region{{36, 36}},
+			[]text.Region{{36, 36}},
 			nil,
 		},
 		{
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			"characters",
 			false,
 			false,
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			nil,
 		},
 		{
-			[]Region{{36, 36}},
+			[]text.Region{{36, 36}},
 			"characters",
 			false,
 			true,
-			[]Region{{36, 36}},
+			[]text.Region{{36, 36}},
 			nil,
 		},
 	}
-	runMoveTest(tests, t, text)
+	runMoveTest(tests, t, inpuText)
 }
 
 func TestMoveByStops(t *testing.T) {
-	text := "Hello WorLd!\nTest12312{\n\n3Stop (testing) tada}\n Abr_akad[abra"
+	inputText := "Hello WorLd!\nTest12312{\n\n3Stop (testing) tada}\n Abr_akad[abra"
 	tests := []MoveTest{
 		{
-			[]Region{{45, 45}},
+			[]text.Region{{45, 45}},
 			"stops",
 			false,
 			true,
-			[]Region{{56, 56}},
-			Args{"word_end": true},
+			[]text.Region{{56, 56}},
+			backend.Args{"word_end": true},
 		},
 		{
-			[]Region{{45, 45}},
+			[]text.Region{{45, 45}},
 			"stops",
 			false,
 			true,
-			[]Region{{46, 46}},
-			Args{"word_end": true, "separators": ""},
+			[]text.Region{{46, 46}},
+			backend.Args{"word_end": true, "separators": ""},
 		},
 		{
-			[]Region{{8, 8}},
+			[]text.Region{{8, 8}},
 			"stops",
 			false,
 			true,
-			[]Region{{24, 24}},
-			Args{"empty_line": true},
+			[]text.Region{{24, 24}},
+			backend.Args{"empty_line": true},
 		},
 		{
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			"stops",
 			false,
 			true,
-			[]Region{{4, 4}},
-			Args{"word_begin": true, "separators": "l"},
+			[]text.Region{{4, 4}},
+			backend.Args{"word_begin": true, "separators": "l"},
 		},
 		{
-			[]Region{{58, 58}},
+			[]text.Region{{58, 58}},
 			"stops",
 			false,
 			true,
-			[]Region{{61, 61}},
-			Args{"punct_begin": true},
+			[]text.Region{{61, 61}},
+			backend.Args{"punct_begin": true},
 		},
 		{
-			[]Region{{7, 7}},
+			[]text.Region{{7, 7}},
 			"stops",
 			false,
 			true,
-			[]Region{{12, 12}},
-			Args{"punct_end": true},
+			[]text.Region{{12, 12}},
+			backend.Args{"punct_end": true},
 		},
 	}
-	runMoveTest(tests, t, text)
+	runMoveTest(tests, t, inputText)
 }
 
 func TestMoveWhenWeHaveTabs(t *testing.T) {
-	text := "\ttype qmlfrontend struct {\n\t\tstatus_message string"
+	inputText := "\ttype qmlfrontend struct {\n\t\tstatus_message string"
 	tests := []MoveTest{
 		{
-			[]Region{{35, 35}},
+			[]text.Region{{35, 35}},
 			"lines",
 			false,
 			false,
-			[]Region{{11, 11}},
+			[]text.Region{{11, 11}},
 			nil,
 		},
 		{
-			[]Region{{11, 11}},
+			[]text.Region{{11, 11}},
 			"lines",
 			false,
 			true,
-			[]Region{{35, 35}},
+			[]text.Region{{35, 35}},
 			nil,
 		},
 	}
-	runMoveTest(tests, t, text)
+	runMoveTest(tests, t, inputText)
 }
 
 type scfe struct {
-	show          Region
+	show          text.Region
 	defaultAction bool
 	files         []string
 }
@@ -435,12 +435,12 @@ func (f *scfe) SetDefaultAction(action bool) {
 func (f *scfe) OkCancelDialog(msg string, button string) bool {
 	return f.defaultAction
 }
-func (f *scfe) VisibleRegion(v *View) Region {
+func (f *scfe) VisibleRegion(v *backend.View) text.Region {
 	s := v.Line(v.TextPoint(3*3, 1))
 	e := v.Line(v.TextPoint(6*3, 1))
-	return Region{s.Begin(), e.End()}
+	return text.Region{s.Begin(), e.End()}
 }
-func (f *scfe) Show(v *View, r Region) {
+func (f *scfe) Show(v *backend.View, r text.Region) {
 	f.show = r
 }
 func (f *scfe) Prompt(title, dir string, flags int) []string {
@@ -449,7 +449,7 @@ func (f *scfe) Prompt(title, dir string, flags int) []string {
 
 func TestScrollLines(t *testing.T) {
 	var fe scfe
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
 	ch := ed.CommandHandler()
 	w := ed.NewWindow()
@@ -465,18 +465,18 @@ func TestScrollLines(t *testing.T) {
 		v.Insert(e, 0, "Hello World!\nTest123123\nAbrakadabra\n")
 	}
 	v.EndEdit(e)
-	ch.RunTextCommand(v, "scroll_lines", Args{"amount": 0})
+	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": 0})
 
 	if c := v.Line(v.TextPoint(3*3, 1)); fe.show.Begin() != c.Begin() {
 		t.Errorf("Expected %v, but got %v", c, fe.show)
 	}
 
-	ch.RunTextCommand(v, "scroll_lines", Args{"amount": 1})
+	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": 1})
 	if c := v.Line(v.TextPoint(3*3-1, 1)); fe.show.Begin() != c.Begin() {
 		t.Errorf("Expected %v, but got %v", c, fe.show)
 	}
 	t.Log(fe.VisibleRegion(v), v.Line(v.TextPoint(6*3+1, 1)))
-	ch.RunTextCommand(v, "scroll_lines", Args{"amount": -1})
+	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": -1})
 	if c := v.Line(v.TextPoint(6*3+1, 1)); fe.show.Begin() != c.Begin() {
 		t.Errorf("Expected %v, but got %v", c, fe.show)
 	}

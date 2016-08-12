@@ -8,93 +8,93 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 	"github.com/limetext/text"
 	"github.com/limetext/util"
 )
 
 type (
-	// The MoveCommand moves the current selection
+	// Move Command moves the current selection.
 	Move struct {
-		DefaultCommand
-		// Specifies the type of "move" operation
+		backend.DefaultCommand
+		// Specifies the type of "move" operation.
 		By MoveByType
-		// Whether the current selection should be extended or not
+		// Whether the current selection should be extended or not.
 		Extend bool
-		// Whether to move forward or backwards
+		// Whether to move forward or backwards.
 		Forward bool
-		// Used together with By=Stops, extends "word_separators" defined by settings
+		// Used together with By=Stops, extends "word_separators" defined by settings.
 		Separators string
-		// Used together with By=Stops, go to word begin
+		// Used together with By=Stops, go to word begin.
 		WordBegin bool
-		// Used together with By=Stops, go to word end
+		// Used together with By=Stops, go to word end.
 		WordEnd bool
-		// Used together with By=Stops, go to punctuation begin
+		// Used together with By=Stops, go to punctuation begin.
 		PunctBegin bool
-		// Used together with By=Stops, go to punctuation end
+		// Used together with By=Stops, go to punctuation end.
 		PunctEnd bool
-		// Used together with By=Stops, go to an empty line
+		// Used together with By=Stops, go to an empty line.
 		EmptyLine bool
 		// Used together with By=Stops, TODO: ???
 		ClipToLine bool
 	}
 
-	// Specifies the type of "move" operation
+	// MoveByType Specifies the type of "move" operation.
 	MoveByType int
 
-	// Specifies the type of "move_to" operation to perform
+	// MoveToType Specifies the type of "move_to" operation to perform.
 	MoveToType int
 
-	// The MoveToCommand moves or extends the current selection to the specified location
+	// MoveTo Command moves or extends the current selection to the specified location.
 	MoveTo struct {
-		DefaultCommand
-		// The type of "move_to" operation to perform
+		backend.DefaultCommand
+		// The type of "move_to" operation to perform.
 		To MoveToType
-		// Whether the current selection should be extended or not
+		// Whether the current selection should be extended or not.
 		Extend bool
 	}
 
-	// The ScrollLinesCommand moves the viewpoint "Amount" lines from the current location
+	// ScrollLines Command moves the viewpoint "Amount" lines from the current location.
 	ScrollLines struct {
-		BypassUndoCommand
-		// The number of lines to scroll (positive or negative direction)
+		backend.BypassUndoCommand
+		// The number of lines to scroll (positive or negative direction).
 		Amount int
 	}
 )
 
 const (
-	// Beginning of line
+	// BOL is Beginning of line.
 	BOL MoveToType = iota
-	// End of line
+	// EOL is End of line
 	EOL
-	// Beginning of file
+	//BOF is Beginning of file.
 	BOF
-	// End of file
+	// EOF is End of file.
 	EOF
-	// Current level close bracket
+	// Brackets >-> Current level close bracket.
 	Brackets
 )
 
 const (
-	// Move by Characters
+	// Characters by Characters.
 	Characters MoveByType = iota
-	// Move by Stops (TODO(.): what exactly is a stop?)
+	// Stops will move by Stops (TODO(.): what exactly is a stop?).
 	Stops
-	// Move by Lines
+	// Lines will move by Lines.
 	Lines
-	// Move by Words
+	// Words will move by Words.
 	Words
-	// Move by Word Ends
+	// WordEnds will move by Word Ends.
 	WordEnds
-	// Move by Sub Words
+	// SubWords will move by Sub Words.
 	SubWords
-	// Move by Sub Word Ends
+	// SubWordEnds will Move by Sub Word Ends.
 	SubWordEnds
-	// Move by Page
+	// Pages will move by Page.
 	Pages
 )
 
-func move_action(v *View, extend bool, transform func(r text.Region) int) {
+func moveAction(v *backend.View, extend bool, transform func(r text.Region) int) {
 	sel := v.Sel()
 	r := sel.Regions()
 	bs := v.Size()
@@ -105,7 +105,7 @@ func move_action(v *View, extend bool, transform func(r text.Region) int) {
 		} else if r[i].B > bs {
 			// Yes > the size, and not size-1 because the cursor being at "size"
 			// is the position it will be at when we are appending
-			// to the buffer
+			// to the buffer.
 			r[i].B = bs
 		}
 
@@ -117,6 +117,7 @@ func move_action(v *View, extend bool, transform func(r text.Region) int) {
 	sel.AddAll(r)
 }
 
+// Set will define the type of move
 func (mt *MoveToType) Set(v interface{}) error {
 	switch to := v.(string); to {
 	case "eol":
@@ -135,28 +136,29 @@ func (mt *MoveToType) Set(v interface{}) error {
 	return nil
 }
 
-func (c *MoveTo) Run(v *View, e *Edit) error {
+// Run executes the MoveTo command.
+func (c *MoveTo) Run(v *backend.View, e *backend.Edit) error {
 	switch c.To {
 	case EOL:
-		move_action(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, func(r text.Region) int {
 			line := v.Line(r.B)
 			return line.B
 		})
 	case BOL:
-		move_action(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, func(r text.Region) int {
 			line := v.Line(r.B)
 			return line.A
 		})
 	case BOF:
-		move_action(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, func(r text.Region) int {
 			return 0
 		})
 	case EOF:
-		move_action(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, func(r text.Region) int {
 			return v.Size()
 		})
 	case Brackets:
-		move_action(v, c.Extend, func(r text.Region) (pos int) {
+		moveAction(v, c.Extend, func(r text.Region) (pos int) {
 			var (
 				of          int
 				co          = 1
@@ -224,6 +226,7 @@ func (c *MoveTo) Run(v *View, e *Edit) error {
 	return nil
 }
 
+// Set the type of move.
 func (m *MoveByType) Set(v interface{}) error {
 	switch by := v.(string); by {
 	case "lines":
@@ -248,13 +251,14 @@ func (m *MoveByType) Set(v interface{}) error {
 	return nil
 }
 
-func (c *Move) Run(v *View, e *Edit) error {
+// Run executes the Move command.
+func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 	p := util.Prof.Enter("move.run.action")
 	defer p.Exit()
 
 	switch c.By {
 	case Characters:
-		move_action(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, func(r text.Region) int {
 			dir := 1
 			if !c.Forward {
 				dir = -1
@@ -262,31 +266,31 @@ func (c *Move) Run(v *View, e *Edit) error {
 			return r.B + dir
 		})
 	case Stops:
-		move_action(v, c.Extend, func(in text.Region) int {
-			tmp := v.Settings().String("word_separators", DEFAULT_SEPARATORS)
+		moveAction(v, c.Extend, func(in text.Region) int {
+			tmp := v.Settings().String("word_separators", backend.DEFAULT_SEPARATORS)
 			defer v.Settings().Set("word_separators", tmp)
 			v.Settings().Set("word_separators", c.Separators)
 
 			classes := 0
 			if c.WordBegin {
-				classes |= CLASS_WORD_START
+				classes |= backend.CLASS_WORD_START
 			}
 			if c.WordEnd {
-				classes |= CLASS_WORD_END
+				classes |= backend.CLASS_WORD_END
 			}
 			if c.PunctBegin {
-				classes |= CLASS_PUNCTUATION_START
+				classes |= backend.CLASS_PUNCTUATION_START
 			}
 			if c.PunctEnd {
-				classes |= CLASS_PUNCTUATION_END
+				classes |= backend.CLASS_PUNCTUATION_END
 			}
 			if c.EmptyLine {
-				classes |= CLASS_EMPTY_LINE
+				classes |= backend.CLASS_EMPTY_LINE
 			}
 			return v.FindByClass(in.B, c.Forward, classes)
 		})
 	case Lines:
-		move_action(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, func(in text.Region) int {
 			r, col := v.RowCol(in.B)
 			fromLine := v.Line(v.TextPoint(r, 0))
 			if !c.Forward {
@@ -311,26 +315,26 @@ func (c *Move) Run(v *View, e *Edit) error {
 			return v.TextPoint(r, col)
 		})
 	case Words:
-		move_action(v, c.Extend, func(in text.Region) int {
-			return v.FindByClass(in.B, c.Forward, CLASS_WORD_START|
-				CLASS_LINE_END|CLASS_LINE_START)
+		moveAction(v, c.Extend, func(in text.Region) int {
+			return v.FindByClass(in.B, c.Forward, backend.CLASS_WORD_START|
+				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case WordEnds:
-		move_action(v, c.Extend, func(in text.Region) int {
-			return v.FindByClass(in.B, c.Forward, CLASS_WORD_END|
-				CLASS_LINE_END|CLASS_LINE_START)
+		moveAction(v, c.Extend, func(in text.Region) int {
+			return v.FindByClass(in.B, c.Forward, backend.CLASS_WORD_END|
+				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case SubWords:
-		move_action(v, c.Extend, func(in text.Region) int {
-			return v.FindByClass(in.B, c.Forward, CLASS_SUB_WORD_START|
-				CLASS_WORD_START|CLASS_PUNCTUATION_START|CLASS_LINE_END|
-				CLASS_LINE_START)
+		moveAction(v, c.Extend, func(in text.Region) int {
+			return v.FindByClass(in.B, c.Forward, backend.CLASS_SUB_WORD_START|
+				backend.CLASS_WORD_START|backend.CLASS_PUNCTUATION_START|backend.CLASS_LINE_END|
+				backend.CLASS_LINE_START)
 		})
 	case SubWordEnds:
-		move_action(v, c.Extend, func(in text.Region) int {
-			return v.FindByClass(in.B, c.Forward, CLASS_SUB_WORD_END|
-				CLASS_WORD_END|CLASS_PUNCTUATION_END|CLASS_LINE_END|
-				CLASS_LINE_START)
+		moveAction(v, c.Extend, func(in text.Region) int {
+			return v.FindByClass(in.B, c.Forward, backend.CLASS_SUB_WORD_END|
+				backend.CLASS_WORD_END|backend.CLASS_PUNCTUATION_END|backend.CLASS_LINE_END|
+				backend.CLASS_LINE_START)
 		})
 	case Pages:
 		// TODO: Should know how many lines does the frontend show in one page
@@ -338,9 +342,10 @@ func (c *Move) Run(v *View, e *Edit) error {
 	return nil
 }
 
+// Default returns the default seprators.
 func (c *Move) Default(key string) interface{} {
 	if key == "separators" {
-		return DEFAULT_SEPARATORS
+		return backend.DEFAULT_SEPARATORS
 	}
 	return nil
 }
@@ -371,8 +376,9 @@ func reverse(s string) string {
 	return string(r)
 }
 
-func (c *ScrollLines) Run(v *View, e *Edit) error {
-	ed := GetEditor()
+// Run executes the ScrollLines command.
+func (c *ScrollLines) Run(v *backend.View, e *backend.Edit) error {
+	ed := backend.GetEditor()
 	fe := ed.Frontend()
 	vr := fe.VisibleRegion(v)
 	var r int
@@ -389,7 +395,7 @@ func (c *ScrollLines) Run(v *View, e *Edit) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&Move{},
 		&MoveTo{},
 		&ScrollLines{},

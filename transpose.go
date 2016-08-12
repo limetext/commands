@@ -5,19 +5,20 @@
 package commands
 
 import (
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type (
-	// Transpose: Swap the characters on either side of the cursor,
+	// Transpose will Swap the characters on either side of the cursor,
 	// then move the cursor forward one character.
 	Transpose struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *Transpose) Run(v *View, e *Edit) error {
+// Run executes the transpose command.
+func (c *Transpose) Run(v *backend.View, e *backend.Edit) error {
 	/*
 		Correct behavior of Transpose:
 			- ...is actually surprisingly complicated.
@@ -34,12 +35,12 @@ func (c *Transpose) Run(v *View, e *Edit) error {
 			- See transpose_test.go for examples.
 	*/
 
-	rsnew := RegionSet{}
+	rsnew := text.RegionSet{}
 	rs := v.Sel().Regions()
 
 	if v.Sel().HasNonEmpty() {
 		// Build a list of transpose regions based on the current selected regions
-		trs := RegionSet{}
+		trs := text.RegionSet{}
 		for _, r := range rs {
 			if r.Empty() {
 				trs.Add(v.Word(r.A))
@@ -60,7 +61,7 @@ func (c *Transpose) Run(v *View, e *Edit) error {
 			dlen := r.Size()
 			v.Replace(e, r, stxt)
 			trs.Adjust(r.Begin()+1, slen-dlen)
-			rsnew.Add(Region{r.Begin(), r.Begin() + slen})
+			rsnew.Add(text.Region{r.Begin(), r.Begin() + slen})
 			stxt, slen = dtxt, dlen
 		}
 
@@ -69,12 +70,12 @@ func (c *Transpose) Run(v *View, e *Edit) error {
 			if i > 0 && r.A-1 == v.Sel().Regions()[i-1].A {
 				continue
 			}
-			rsnew.Add(Region{r.A + 1, r.B + 1})
+			rsnew.Add(text.Region{r.A + 1, r.B + 1})
 			if r.A == 0 || r.A >= v.Size() {
 				continue
 			}
-			r1 := Region{r.A - 1, r.A}
-			r2 := Region{r.A, r.A + 1}
+			r1 := text.Region{r.A - 1, r.A}
+			r2 := text.Region{r.A, r.A + 1}
 			s1 := v.Substr(r1)
 			s2 := v.Substr(r2)
 			v.Replace(e, r1, s2)
@@ -85,14 +86,14 @@ func (c *Transpose) Run(v *View, e *Edit) error {
 	// Rebuild the active selections
 	v.Sel().Clear()
 	for _, r := range rsnew.Regions() {
-		v.Sel().Add(Region{r.A, r.B})
+		v.Sel().Add(text.Region{r.A, r.B})
 	}
 
 	return nil
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&Transpose{},
 	})
 }

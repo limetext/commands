@@ -7,23 +7,24 @@ package commands
 import (
 	"strings"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type (
-	// The IndentCommand increments indentation of selection.
+	// Indent Command increments indentation of selection.
 	Indent struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The UnindentCommand decrements indentation of selection.
+	// Unindent Command decrements indentation of selection.
 	Unindent struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *Indent) Run(v *View, e *Edit) error {
+// Run executes the Indent command.
+func (c *Indent) Run(v *backend.View, e *backend.Edit) error {
 	indent := "\t"
 	if t := v.Settings().Bool("translate_tabs_to_spaces", false); t {
 		indent = strings.Repeat(" ", v.Settings().Int("tab_size", 4))
@@ -32,9 +33,9 @@ func (c *Indent) Run(v *View, e *Edit) error {
 
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
-		start_row, _ := v.RowCol(r.Begin())
-		end_row, _ := v.RowCol(r.End())
-		for row := start_row; row <= end_row; row++ {
+		startRow, _ := v.RowCol(r.Begin())
+		endRow, _ := v.RowCol(r.End())
+		for row := startRow; row <= endRow; row++ {
 			// Insert an indent at the beginning of the line
 			pos := v.TextPoint(row, 0)
 			v.Insert(e, pos, indent)
@@ -43,33 +44,34 @@ func (c *Indent) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *Unindent) Run(v *View, e *Edit) error {
-	tab_size := v.Settings().Int("tab_size", 4)
+// Run executes the Unindent command.
+func (c *Unindent) Run(v *backend.View, e *backend.Edit) error {
+	tabSize := v.Settings().Int("tab_size", 4)
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
-		start_row, _ := v.RowCol(r.Begin())
-		end_row, _ := v.RowCol(r.End())
-		for row := start_row; row <= end_row; row++ {
+		startRow, _ := v.RowCol(r.Begin())
+		endRow, _ := v.RowCol(r.End())
+		for row := startRow; row <= endRow; row++ {
 			pos := v.TextPoint(row, 0)
 			// Get the first at the beginning of the line (as many as defined by tab_size)
-			sub := v.Substr(Region{pos, pos + tab_size})
+			sub := v.Substr(text.Region{pos, pos + tabSize})
 			if len(sub) == 0 {
 				continue
 			}
-			to_remove := 0
+			toRemove := 0
 			if sub[0] == byte('\t') {
 				// Case 1: the first character is a tab, remove only it
-				to_remove = 1
+				toRemove = 1
 			} else if sub[0] == byte(' ') {
 				// Case 2: the first character is a space, we remove as much spaces as we can
-				to_remove = 1
-				for to_remove < len(sub) && sub[to_remove] == byte(' ') {
-					to_remove++
+				toRemove = 1
+				for toRemove < len(sub) && sub[toRemove] == byte(' ') {
+					toRemove++
 				}
 			}
-			if to_remove > 0 {
-				v.Erase(e, Region{pos, pos + to_remove})
+			if toRemove > 0 {
+				v.Erase(e, text.Region{pos, pos + toRemove})
 			}
 		}
 	}
@@ -77,7 +79,7 @@ func (c *Unindent) Run(v *View, e *Edit) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&Indent{},
 		&Unindent{},
 	})

@@ -7,41 +7,42 @@ package commands
 import (
 	"strings"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 	"github.com/limetext/text"
 )
 
 type (
-	// The InsertCommand inserts the given characters, at all
+	// Insert Command inserts the given characters, at all
 	// of the current selection locations, possibly replacing
 	// text if the selection area covers one or more characters.
 	Insert struct {
-		DefaultCommand
+		backend.DefaultCommand
 		// The characters to insert
 		Characters string
 	}
 
-	// The LeftDeleteCommand deletes characters to the left of the
+	// LeftDelete Command deletes characters to the left of the
 	// current selection or the current selection if it is not empty.
 	LeftDelete struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The RightDeleteCommand deletes characters to the right of the
+	// RightDelete Command deletes characters to the right of the
 	// current selection or the current selection if it is not empty.
 	RightDelete struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The DeleteWordCommand deletes one word to right or left
-	// depending on forward variable
+	// DeleteWord Command deletes one word to right or left
+	// depending on forward variable.
 	DeleteWord struct {
-		DefaultCommand
+		backend.DefaultCommand
 		Forward bool
 	}
 )
 
-func (c *Insert) Run(v *View, e *Edit) error {
+// Run executes the Insert command.
+func (c *Insert) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -54,13 +55,14 @@ func (c *Insert) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *LeftDelete) Run(v *View, e *Edit) error {
-	trim_space := false
-	tab_size := 4
+// Run executes the LeftDelete command.
+func (c *LeftDelete) Run(v *backend.View, e *backend.Edit) error {
+	trimSpace := false
+	tabSize := 4
 	if t := v.Settings().Bool("translate_tabs_to_spaces", false); t {
 		if t = v.Settings().Bool("use_tab_stops", true); t {
-			trim_space = true
-			tab_size = v.Settings().Int("tab_size", 4)
+			trimSpace = true
+			tabSize = v.Settings().Int("tab_size", 4)
 		}
 	}
 
@@ -74,15 +76,15 @@ func (c *LeftDelete) Run(v *View, e *Edit) error {
 		}
 		r := sel.Get(i)
 		if r.A == r.B && !hasNonEmpty {
-			if trim_space {
+			if trimSpace {
 				_, col := v.RowCol(r.A)
-				prev_col := r.A - (col - (col-tab_size+(tab_size-1))&^(tab_size-1))
-				if prev_col < 0 {
-					prev_col = 0
+				prevCol := r.A - (col - (col-tabSize+(tabSize-1))&^(tabSize-1))
+				if prevCol < 0 {
+					prevCol = 0
 				}
-				d := v.SubstrR(text.Region{A: prev_col, B: r.A})
+				d := v.SubstrR(text.Region{A: prevCol, B: r.A})
 				i := len(d) - 1
-				for r.A > prev_col && i >= 0 && d[i] == ' ' {
+				for r.A > prevCol && i >= 0 && d[i] == ' ' {
 					r.A--
 					i--
 				}
@@ -100,7 +102,8 @@ func (c *LeftDelete) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *RightDelete) Run(v *View, e *Edit) error {
+// Run executes the RightDelete command.
+func (c *RightDelete) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	hasNonEmpty := sel.HasNonEmpty()
 	i := 0
@@ -122,12 +125,13 @@ func (c *RightDelete) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *DeleteWord) Run(v *View, e *Edit) error {
+// Run executes the DeleteWord command.
+func (c *DeleteWord) Run(v *backend.View, e *backend.Edit) error {
 	var class int
 	if c.Forward {
-		class = CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_START
+		class = backend.CLASS_WORD_END | backend.CLASS_PUNCTUATION_END | backend.CLASS_LINE_START
 	} else {
-		class = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END | CLASS_LINE_START
+		class = backend.CLASS_WORD_START | backend.CLASS_PUNCTUATION_START | backend.CLASS_LINE_END | backend.CLASS_LINE_START
 	}
 
 	sel := v.Sel()
@@ -147,14 +151,14 @@ func (c *DeleteWord) Run(v *View, e *Edit) error {
 	sel.Clear()
 	sel.AddAll(rs)
 	if c.Forward {
-		GetEditor().CommandHandler().RunTextCommand(v, "right_delete", nil)
+		backend.GetEditor().CommandHandler().RunTextCommand(v, "right_delete", nil)
 	} else {
-		GetEditor().CommandHandler().RunTextCommand(v, "left_delete", nil)
+		backend.GetEditor().CommandHandler().RunTextCommand(v, "left_delete", nil)
 	}
 	return nil
 }
 
-func (c *DeleteWord) findByClass(point int, class int, v *View) int {
+func (c *DeleteWord) findByClass(point int, class int, v *backend.View) int {
 	var end, d int
 	if c.Forward {
 		d = 1
@@ -164,7 +168,7 @@ func (c *DeleteWord) findByClass(point int, class int, v *View) int {
 		}
 		s := v.Substr(text.Region{A: point, B: point + 2})
 		if strings.Contains(s, "\t") && strings.Contains(s, " ") {
-			class = CLASS_WORD_START | CLASS_PUNCTUATION_START | CLASS_LINE_END
+			class = backend.CLASS_WORD_START | backend.CLASS_PUNCTUATION_START | backend.CLASS_LINE_END
 		}
 	} else {
 		d = -1
@@ -174,7 +178,7 @@ func (c *DeleteWord) findByClass(point int, class int, v *View) int {
 		}
 		s := v.Substr(text.Region{A: point - 2, B: point})
 		if strings.Contains(s, "\t") && strings.Contains(s, " ") {
-			class = CLASS_WORD_END | CLASS_PUNCTUATION_END | CLASS_LINE_START
+			class = backend.CLASS_WORD_END | backend.CLASS_PUNCTUATION_END | backend.CLASS_LINE_START
 		}
 	}
 	point += d
@@ -187,7 +191,7 @@ func (c *DeleteWord) findByClass(point int, class int, v *View) int {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&Insert{},
 		&LeftDelete{},
 		&RightDelete{},

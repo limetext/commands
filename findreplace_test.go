@@ -8,19 +8,19 @@ import (
 	"reflect"
 	"testing"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type findTest struct {
 	text string
-	in   []Region
-	exp  []Region
+	in   []text.Region
+	exp  []text.Region
 	fw   bool
 }
 
 func runFindTest(tests []findTest, t *testing.T, commands ...string) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -48,7 +48,7 @@ func runFindTest(tests []findTest, t *testing.T, commands ...string) {
 			t.Errorf("Test %d: Expected %s, but got %s", i, test.exp, sr)
 		}
 		e = v.BeginEdit()
-		v.Erase(e, Region{0, v.Size()})
+		v.Erase(e, text.Region{0, v.Size()})
 		v.EndEdit(e)
 	}
 }
@@ -57,14 +57,14 @@ func TestFindUnderExpand(t *testing.T) {
 	tests := []findTest{
 		{
 			"Hello World!\nTest123123\nAbrakadabra\n",
-			[]Region{{0, 0}},
-			[]Region{{0, 5}},
+			[]text.Region{{0, 0}},
+			[]text.Region{{0, 5}},
 			true,
 		},
 		{
 			"Hello World!\nTest123123\nAbrakadabra\n",
-			[]Region{{19, 20}},
-			[]Region{{19, 20}, {22, 23}},
+			[]text.Region{{19, 20}},
+			[]text.Region{{19, 20}, {22, 23}},
 			true,
 		},
 	}
@@ -76,22 +76,22 @@ func TestFindNext(t *testing.T) {
 	tests := []findTest{
 		{
 			"Hello World!\nTest123123\nAbrakadabra\n",
-			[]Region{{17, 20}},
-			[]Region{{17, 20}},
+			[]text.Region{{17, 20}},
+			[]text.Region{{17, 20}},
 			true,
 		},
 		// test find_wrap setting true
 		{
 			"Hello World!\nTest123123\nAbrakadabra\n",
-			[]Region{{21, 23}},
-			[]Region{{18, 20}},
+			[]text.Region{{21, 23}},
+			[]text.Region{{18, 20}},
 			true,
 		},
 		// test find_wrap setting false
 		{
 			"Hello World!\nTest123123\nAbrakadabra\n",
-			[]Region{{21, 23}},
-			[]Region{{21, 23}},
+			[]text.Region{{21, 23}},
+			[]text.Region{{21, 23}},
 			false,
 		},
 	}
@@ -100,14 +100,14 @@ func TestFindNext(t *testing.T) {
 }
 
 type replaceTest struct {
-	cursors []Region
+	cursors []text.Region
 	in      string
 	exp     string
 	fw      bool
 }
 
 func runReplaceTest(tests []replaceTest, t *testing.T, commands ...string) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -133,11 +133,11 @@ func runReplaceTest(tests []replaceTest, t *testing.T, commands ...string) {
 		for _, command := range commands {
 			ed.CommandHandler().RunTextCommand(v, command, nil)
 		}
-		if out := v.Substr(Region{0, v.Size()}); out != test.exp {
+		if out := v.Substr(text.Region{0, v.Size()}); out != test.exp {
 			t.Errorf("Test %d failed: %s, %+v", i, out, test)
 		}
 		e = v.BeginEdit()
-		v.Erase(e, Region{0, v.Size()})
+		v.Erase(e, text.Region{0, v.Size()})
 		v.EndEdit(e)
 	}
 }
@@ -145,45 +145,45 @@ func runReplaceTest(tests []replaceTest, t *testing.T, commands ...string) {
 func TestReplaceNext(t *testing.T) {
 	tests := []replaceTest{
 		{
-			[]Region{{1, 1}, {2, 2}, {3, 3}},
+			[]text.Region{{1, 1}, {2, 2}, {3, 3}},
 			"abc abc bac abc abc",
 			"abc f bac abc abc",
 			true,
 		},
 		{
-			[]Region{{0, 0}, {4, 4}, {8, 8}, {12, 13}},
+			[]text.Region{{0, 0}, {4, 4}, {8, 8}, {12, 13}},
 			"abc abc bac abc abc",
 			"abc abc bac abc f",
 			true,
 		},
 		{
-			[]Region{{12, 13}, {8, 8}, {4, 4}, {1, 0}},
+			[]text.Region{{12, 13}, {8, 8}, {4, 4}, {1, 0}},
 			"abc abc bac abc abc",
 			"abc abc bac abc f",
 			true,
 		},
 		{
-			[]Region{{15, 15}},
+			[]text.Region{{15, 15}},
 			"abc abc bac abc abc",
 			"abc abc bac abc f",
 			true,
 		},
 		{
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			"abc abc bac abc abc",
 			"abc f bac abc abc",
 			true,
 		},
 		// test find_wrap setting true
 		{
-			[]Region{{16, 19}},
+			[]text.Region{{16, 19}},
 			"abc abc bac abc abc",
 			"f abc bac abc abc",
 			true,
 		},
 		// test find_wrap setting false
 		{
-			[]Region{{16, 19}},
+			[]text.Region{{16, 19}},
 			"abc abc bac abc abc",
 			"abc abc bac abc abc",
 			false,

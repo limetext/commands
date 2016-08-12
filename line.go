@@ -7,36 +7,43 @@ package commands
 import (
 	"strings"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type (
 	// JoinLines removes every new line in the
-	// selections and the first new line after
+	// selections and the first new line after.
 	JoinLines struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// SelectLines makes the selection fill the lines
+	// covered by it currently
 	SelectLines struct {
-		DefaultCommand
+		backend.DefaultCommand
 		Forward bool
 	}
-
+	// SwapLineUp swaps the currently selected lines with the ones above
 	SwapLineUp struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// SwapLineDown swaps the currently selected
+	// lines with the ones below
 	SwapLineDown struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// SplitSelectionIntoLines will split the current
+	// selection into lines.
 	SplitSelectionIntoLines struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *JoinLines) Run(v *View, e *Edit) error {
+// Run executes the JoinLines command.
+func (c *JoinLines) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -72,14 +79,15 @@ func (c *JoinLines) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SwapLineUp) Run(v *View, e *Edit) error {
+// Run executes the SwapLineUp command.
+func (c *SwapLineUp) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
 		// Expand to all lines under selection
 		fline := v.Line(r.Begin())
 		lline := v.Line(r.End())
-		r = Region{fline.Begin(), lline.End()}
+		r = text.Region{fline.Begin(), lline.End()}
 		t := v.Substr(r)
 		// Select line before region
 		bline := v.Line(r.Begin() - 1)
@@ -91,14 +99,15 @@ func (c *SwapLineUp) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SwapLineDown) Run(v *View, e *Edit) error {
+// Run executes the SwapLineDown command.
+func (c *SwapLineDown) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
 		// Expand to all lines under selection
 		fline := v.Line(r.Begin())
 		lline := v.Line(r.End())
-		r = Region{fline.Begin(), lline.End()}
+		r = text.Region{fline.Begin(), lline.End()}
 		t := v.Substr(r)
 		// Select line before region
 		nline := v.Line(r.End() + 1)
@@ -110,10 +119,11 @@ func (c *SwapLineDown) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SelectLines) Run(v *View, e *Edit) error {
+// Run executes the SelectLines command.
+func (c *SelectLines) Run(v *backend.View, e *backend.Edit) error {
 	var (
-		rs      []Region
-		line, l Region
+		rs      []text.Region
+		line, l text.Region
 		d       int
 	)
 
@@ -134,9 +144,9 @@ func (c *SelectLines) Run(v *View, e *Edit) error {
 		// Put new region at the exact distance
 		// If not put region at the end of the next|before line
 		if l.Size() < d {
-			rs = append(rs, Region{l.End(), l.End()})
+			rs = append(rs, text.Region{l.End(), l.End()})
 		} else {
-			rs = append(rs, Region{l.Begin() + d, l.Begin() + d})
+			rs = append(rs, text.Region{l.Begin() + d, l.Begin() + d})
 		}
 	}
 	v.Sel().AddAll(rs)
@@ -144,8 +154,9 @@ func (c *SelectLines) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SplitSelectionIntoLines) Run(v *View, e *Edit) error {
-	var rs []Region
+// Run executes the SplitSelectionIntoLines command
+func (c *SplitSelectionIntoLines) Run(v *backend.View, e *backend.Edit) error {
+	var rs []text.Region
 
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
@@ -167,7 +178,7 @@ func (c *SplitSelectionIntoLines) Run(v *View, e *Edit) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&JoinLines{},
 		&SelectLines{},
 		&SwapLineUp{},

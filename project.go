@@ -7,35 +7,48 @@ package commands
 import (
 	"fmt"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 type (
+
+	// SaveProjectAs command enables us to save the project
+	// as a text file, which can then be imported
+	// into lime using PromptOpenProject command.
 	SaveProjectAs struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// PromptOpenProject command enables us to open the
+	// project file saved using the SaveProjectAs command.
 	PromptOpenProject struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// CloseProject command enables us to close an existing
+	// open project.
 	CloseProject struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// PromptAddFolder adds a folder to the existing
+	// opened project.
 	PromptAddFolder struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// CloseFolderList removes the folder list from the
+	// opened project.
 	CloseFolderList struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *SaveProjectAs) Run(w *Window) error {
+// Run executes the SaveProjectAs command.
+func (c *SaveProjectAs) Run(w *backend.Window) error {
 	dir := viewDirectory(w.ActiveView())
-	fe := GetEditor().Frontend()
-	files := fe.Prompt("Save file", dir, PROMPT_SAVE_AS)
+	fe := backend.GetEditor().Frontend()
+	files := fe.Prompt("Save file", dir, backend.PROMPT_SAVE_AS)
 	if len(files) == 0 {
 		return nil
 	}
@@ -48,9 +61,10 @@ func (c *SaveProjectAs) Run(w *Window) error {
 	return nil
 }
 
-func (c *PromptOpenProject) Run(w *Window) error {
+// Run executes the PromptOpenProject command.
+func (c *PromptOpenProject) Run(w *backend.Window) error {
 	dir := viewDirectory(w.ActiveView())
-	fe := GetEditor().Frontend()
+	fe := backend.GetEditor().Frontend()
 	files := fe.Prompt("Open file", dir, 0)
 	if len(files) == 0 {
 		return nil
@@ -63,22 +77,25 @@ func (c *PromptOpenProject) Run(w *Window) error {
 	return nil
 }
 
-func (c *CloseProject) Run(w *Window) error {
+// Run executes the CloseProject command.
+func (c *CloseProject) Run(w *backend.Window) error {
 	w.Project().Close()
 	return nil
 }
 
-func (c *PromptAddFolder) Run(w *Window) error {
+// Run executes the PromptAddFolder command.
+func (c *PromptAddFolder) Run(w *backend.Window) error {
 	dir := viewDirectory(w.ActiveView())
-	fe := GetEditor().Frontend()
-	folders := fe.Prompt("Open file", dir, PROMPT_ONLY_FOLDER|PROMPT_SELECT_MULTIPLE)
+	fe := backend.GetEditor().Frontend()
+	folders := fe.Prompt("Open file", dir, backend.PROMPT_ONLY_FOLDER|backend.PROMPT_SELECT_MULTIPLE)
 	for _, folder := range folders {
 		w.Project().AddFolder(folder)
 	}
 	return nil
 }
 
-func (c *CloseFolderList) Run(w *Window) error {
+// Run executes the CloseFolderList command.
+func (c *CloseFolderList) Run(w *backend.Window) error {
 	for _, folder := range w.Project().Folders() {
 		w.Project().RemoveFolder(folder)
 	}
@@ -86,7 +103,7 @@ func (c *CloseFolderList) Run(w *Window) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&SaveProjectAs{},
 		&PromptOpenProject{},
 		&CloseProject{},

@@ -7,7 +7,7 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 func TestRunApplication(t *testing.T) {
@@ -22,7 +22,7 @@ func TestRunApplication(t *testing.T) {
 func TestRunNopWindow(t *testing.T) {
 	nopWindow := NopWindow{}
 
-	if nopWindow.Run(&Window{}) != nil {
+	if nopWindow.Run(&backend.Window{}) != nil {
 		t.Error("No op window command running returns not nil")
 	}
 }
@@ -30,7 +30,7 @@ func TestRunNopWindow(t *testing.T) {
 func TestRunNopText(t *testing.T) {
 	nopText := NopText{}
 
-	if nopText.Run(&View{}, &Edit{}) != nil {
+	if nopText.Run(&backend.View{}, &backend.Edit{}) != nil {
 		t.Error("No op text command running returns not nil")
 	}
 }

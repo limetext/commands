@@ -9,36 +9,40 @@ import (
 	"os/user"
 	"path"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 type (
+	// NewFile command creates a new file.
 	NewFile struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
-
+	// PromptOpenFile command prompts opening
+	// an existing file from the filesystem.
 	PromptOpenFile struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *NewFile) Run(w *Window) error {
-	ed := GetEditor()
+// Run executes the NewFile command.
+func (c *NewFile) Run(w *backend.Window) error {
+	ed := backend.GetEditor()
 	ed.ActiveWindow().NewFile()
 	return nil
 }
 
-func (o *PromptOpenFile) Run(w *Window) error {
+// Run executes the PromptOpenFile command.
+func (o *PromptOpenFile) Run(w *backend.Window) error {
 	dir := viewDirectory(w.ActiveView())
-	fe := GetEditor().Frontend()
-	files := fe.Prompt("Open file", dir, PROMPT_SELECT_MULTIPLE)
+	fe := backend.GetEditor().Frontend()
+	files := fe.Prompt("Open file", dir, backend.PROMPT_SELECT_MULTIPLE)
 	for _, file := range files {
 		w.OpenFile(file, 0)
 	}
 	return nil
 }
 
-func viewDirectory(v *View) string {
+func viewDirectory(v *backend.View) string {
 	if v != nil && v.FileName() != "" {
 		p := path.Dir(v.FileName())
 		if _, err := os.Stat(p); err == nil {
@@ -52,7 +56,7 @@ func viewDirectory(v *View) string {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&NewFile{},
 		&PromptOpenFile{},
 	})

@@ -9,10 +9,10 @@ import (
 	"os"
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
-var testfile string = "testdata/save_test.txt"
+var testfile = "testdata/save_test.txt"
 
 func TestSave(t *testing.T) {
 	hold, err := ioutil.ReadFile(testfile)
@@ -37,7 +37,7 @@ func TestSave(t *testing.T) {
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -77,7 +77,7 @@ func TestSaveAs(t *testing.T) {
 	const name = "testdata/save_as_test.txt"
 	fe.files = []string{name}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
 	w := ed.NewWindow()
 	defer w.Close()
@@ -106,7 +106,7 @@ func TestSaveAs(t *testing.T) {
 func TestSaveAll(t *testing.T) {
 	var err error
 	holds := make(map[int][]byte)
-	views := make(map[int]*View)
+	views := make(map[int]*backend.View)
 	files := []struct {
 		file   string
 		expect string
@@ -121,7 +121,7 @@ func TestSaveAll(t *testing.T) {
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetFrontend(&scfe{})
 	fe := ed.Frontend()
 	if dfe, ok := fe.(*scfe); ok {

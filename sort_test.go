@@ -7,8 +7,8 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type sortTest struct {
@@ -16,12 +16,12 @@ type sortTest struct {
 	caseSensitive    bool
 	reverse          bool
 	removeDuplicates bool
-	sel              []Region
+	sel              []text.Region
 	expect           string
 }
 
 func runSortTest(command string, tests []sortTest, t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -41,14 +41,14 @@ func runSortTest(command string, tests []sortTest, t *testing.T) {
 			v.Sel().Add(r)
 		}
 
-		args := Args{
+		args := backend.Args{
 			"case_sensitive":    test.caseSensitive,
 			"reverse":           test.reverse,
 			"remove_duplicates": test.removeDuplicates,
 		}
 		ed.CommandHandler().RunTextCommand(v, command, args)
 
-		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
+		if d := v.Substr(text.Region{0, v.Size()}); d != test.expect {
 			t.Errorf("Test %d: Excepted %#v,\n but got %#v", i, test.expect, d)
 		}
 	}
@@ -61,7 +61,7 @@ func TestSortLines(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{0, 5}},
+			[]text.Region{{0, 5}},
 			"B\na\nc",
 		},
 		{ // Case insensitive
@@ -69,7 +69,7 @@ func TestSortLines(t *testing.T) {
 			false,
 			false,
 			false,
-			[]Region{{0, 17}},
+			[]text.Region{{0, 17}},
 			"lime\nSublime\ntext",
 		},
 		{ // Reverse
@@ -77,7 +77,7 @@ func TestSortLines(t *testing.T) {
 			true,
 			true,
 			false,
-			[]Region{{0, 5}},
+			[]text.Region{{0, 5}},
 			"c\nb\na",
 		},
 		{ // Noncontinuous selection
@@ -85,7 +85,7 @@ func TestSortLines(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{0, 1}, {4, 5}},
+			[]text.Region{{0, 1}, {4, 5}},
 			"a\nc\nb",
 		},
 		{ // Noncontinuous selection, out of order
@@ -93,7 +93,7 @@ func TestSortLines(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{4, 5}, {0, 1}},
+			[]text.Region{{4, 5}, {0, 1}},
 			"a\nc\nb",
 		},
 		{ // Remove duplicates
@@ -101,7 +101,7 @@ func TestSortLines(t *testing.T) {
 			true,
 			false,
 			true,
-			[]Region{{0, 5}},
+			[]text.Region{{0, 5}},
 			"a\nb\n",
 		},
 		{ // Remove duplicates case insensitive
@@ -109,7 +109,7 @@ func TestSortLines(t *testing.T) {
 			false,
 			false,
 			true,
-			[]Region{{0, 5}},
+			[]text.Region{{0, 5}},
 			"a\nb\n",
 		},
 		{ // No duplicates removal
@@ -117,7 +117,7 @@ func TestSortLines(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{0, 8}},
+			[]text.Region{{0, 8}},
 			"a\nb\nc\nc\n",
 		},
 	}
@@ -132,7 +132,7 @@ func TestSortSelection(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{0, 1}, {1, 2}, {2, 3}},
+			[]text.Region{{0, 1}, {1, 2}, {2, 3}},
 			"Bac",
 		},
 		{ // Case insensitive
@@ -140,7 +140,7 @@ func TestSortSelection(t *testing.T) {
 			false,
 			false,
 			false,
-			[]Region{{0, 4}, {4, 11}, {11, 15}},
+			[]text.Region{{0, 4}, {4, 11}, {11, 15}},
 			"limeSublimetext",
 		},
 		{ // Reverse
@@ -148,7 +148,7 @@ func TestSortSelection(t *testing.T) {
 			true,
 			true,
 			false,
-			[]Region{{0, 1}, {1, 2}, {2, 3}},
+			[]text.Region{{0, 1}, {1, 2}, {2, 3}},
 			"cba",
 		},
 		{ // Noncontinuous selection
@@ -156,7 +156,7 @@ func TestSortSelection(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{0, 1}, {2, 3}},
+			[]text.Region{{0, 1}, {2, 3}},
 			"acb",
 		},
 		{ // Noncontinuous selection, out of order
@@ -164,7 +164,7 @@ func TestSortSelection(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{2, 3}, {0, 1}},
+			[]text.Region{{2, 3}, {0, 1}},
 			"acb",
 		},
 		{ // Remove duplicates
@@ -172,7 +172,7 @@ func TestSortSelection(t *testing.T) {
 			true,
 			false,
 			true,
-			[]Region{{0, 1}, {1, 2}, {2, 3}},
+			[]text.Region{{0, 1}, {1, 2}, {2, 3}},
 			"ab",
 		},
 		{ // Remove duplicates case insensitive
@@ -180,7 +180,7 @@ func TestSortSelection(t *testing.T) {
 			false,
 			false,
 			true,
-			[]Region{{0, 1}, {1, 2}, {2, 3}},
+			[]text.Region{{0, 1}, {1, 2}, {2, 3}},
 			"ab",
 		},
 		{ // No duplicates removal
@@ -188,7 +188,7 @@ func TestSortSelection(t *testing.T) {
 			true,
 			false,
 			false,
-			[]Region{{0, 1}, {1, 2}, {2, 3}, {3, 4}},
+			[]text.Region{{0, 1}, {1, 2}, {2, 3}, {3, 4}},
 			"abcc",
 		},
 	}

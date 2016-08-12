@@ -5,70 +5,85 @@
 package commands
 
 import (
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 type (
+	// NewWindow command opens a new window.
 	NewWindow struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// CloseAll command closes all the
+	// open views inside the current window.
 	CloseAll struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// CloseWindow command lets us close the current window.
 	CloseWindow struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// NewWindowApp creates a new window, setting it as active.
 	NewWindowApp struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
+	// CloseWindowApp command closes all the active windows.
 	CloseWindowApp struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *NewWindow) Run(w *Window) error {
-	ed := GetEditor()
+// Run executes the NewWindow command.
+func (c *NewWindow) Run(w *backend.Window) error {
+	ed := backend.GetEditor()
 	ed.SetActiveWindow(ed.NewWindow())
 	return nil
 }
 
-func (c *CloseAll) Run(w *Window) error {
+// Run executes the CloseAll command.
+func (c *CloseAll) Run(w *backend.Window) error {
 	w.CloseAllViews()
 	return nil
 }
 
-func (c *CloseWindow) Run(w *Window) error {
-	ed := GetEditor()
+// Run executes the CloseWindow command.
+func (c *CloseWindow) Run(w *backend.Window) error {
+	ed := backend.GetEditor()
 	ed.ActiveWindow().Close()
 	return nil
 }
 
+// Run executes the NewWindowApp command.
 func (c *NewWindowApp) Run() error {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetActiveWindow(ed.NewWindow())
 	return nil
 }
 
+// Run executes the CloseWindowApp command.
 func (c *CloseWindowApp) Run() error {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.ActiveWindow().Close()
 	return nil
 }
 
+// IsChecked shows if NewWindowApp has a
+// checkbox in the frontend.
 func (c *NewWindowApp) IsChecked() bool {
 	return false
 }
 
+// IsChecked shows if CloseWindowApp has a
+// checkbox in the frontend.
 func (c *CloseWindowApp) IsChecked() bool {
 	return false
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&NewWindow{},
 		&CloseAll{},
 		&CloseWindow{},

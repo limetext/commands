@@ -7,11 +7,11 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 func TestNewWindow(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	l := len(ed.Windows())
 	ed.CommandHandler().RunWindowCommand(ed.ActiveWindow(), "new_window", nil)
 
@@ -21,7 +21,7 @@ func TestNewWindow(t *testing.T) {
 }
 
 func TestCloseAll(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 
 	w := ed.NewWindow()
 	defer w.Close()
@@ -38,7 +38,7 @@ func TestCloseAll(t *testing.T) {
 }
 
 func TestCloseWindow(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	l := len(ed.Windows())
 	ed.CommandHandler().RunWindowCommand(w, "close_window", nil)
@@ -49,7 +49,7 @@ func TestCloseWindow(t *testing.T) {
 }
 
 func TestNewAppWindow(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	l := len(ed.Windows())
 	ed.CommandHandler().RunApplicationCommand("new_window", nil)
 
@@ -59,7 +59,7 @@ func TestNewAppWindow(t *testing.T) {
 }
 
 func TestCloseAppWindow(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	_ = ed.NewWindow()
 	l := len(ed.Windows())
 	ed.CommandHandler().RunApplicationCommand("close_window", nil)

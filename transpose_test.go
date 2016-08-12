@@ -7,12 +7,12 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 func TestTranspose(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 
 	w := ed.NewWindow()
 	defer w.Close()
@@ -25,9 +25,9 @@ func TestTranspose(t *testing.T) {
 
 	type Test struct {
 		start      string
-		regions    []Region
+		regions    []text.Region
 		expect     string
-		newregions []Region
+		newregions []text.Region
 	}
 
 	// Test results produced using ST3, and s like:
@@ -38,46 +38,46 @@ func TestTranspose(t *testing.T) {
 		{
 			// Simple test with just one cursor position
 			"one",
-			[]Region{{1, 1}},
+			[]text.Region{{1, 1}},
 			"noe",
-			[]Region{{2, 2}},
+			[]text.Region{{2, 2}},
 		},
 		{
 			// Test with several cursors, including one at the beginning of
 			// the buffer, which doesn't transpose, and one beyond the end.
 			"one two three four",
-			[]Region{{0, 0}, {2, 2}, {5, 5}, {20, 20}},
+			[]text.Region{{0, 0}, {2, 2}, {5, 5}, {20, 20}},
 			"oen wto three four",
-			[]Region{{1, 1}, {3, 3}, {6, 6}, {21, 21}},
+			[]text.Region{{1, 1}, {3, 3}, {6, 6}, {21, 21}},
 		},
 		{
 			// Similar test, but with two adjacent cursors. The second one gets
 			// dropped, and doesn't transpose.
 			"one two three four",
-			[]Region{{0, 0}, {1, 1}, {5, 5}},
+			[]text.Region{{0, 0}, {1, 1}, {5, 5}},
 			"one wto three four",
-			[]Region{{1, 1}, {6, 6}},
+			[]text.Region{{1, 1}, {6, 6}},
 		},
 		{
 			// Test with a single region. This should do nothing.
 			"one two three four",
-			[]Region{{6, 10}},
+			[]text.Region{{6, 10}},
 			"one two three four",
-			[]Region{{6, 10}},
+			[]text.Region{{6, 10}},
 		},
 		{
 			// Test with two regions of different sizes
 			"one two three four",
-			[]Region{{4, 7}, {8, 13}},
+			[]text.Region{{4, 7}, {8, 13}},
 			"one three two four",
-			[]Region{{4, 9}, {10, 13}},
+			[]text.Region{{4, 9}, {10, 13}},
 		},
 		{
 			// Test with four regions
 			"one two three four",
-			[]Region{{0, 3}, {4, 7}, {8, 13}, {14, 18}},
+			[]text.Region{{0, 3}, {4, 7}, {8, 13}, {14, 18}},
 			"four one two three",
-			[]Region{{0, 4}, {5, 8}, {9, 12}, {13, 18}},
+			[]text.Region{{0, 4}, {5, 8}, {9, 12}, {13, 18}},
 		},
 		{
 			// Test with one region and three cursors. The newline at the end
@@ -85,23 +85,23 @@ func TestTranspose(t *testing.T) {
 			// call, which currently has problems if it finds EOF at the end
 			// of the word.
 			"one two three four\n",
-			[]Region{{0, 0}, {4, 7}, {9, 9}, {16, 16}},
+			[]text.Region{{0, 0}, {4, 7}, {9, 9}, {16, 16}},
 			"four one two three\n",
-			[]Region{{0, 4}, {5, 8}, {9, 12}, {13, 18}},
+			[]text.Region{{0, 4}, {5, 8}, {9, 12}, {13, 18}},
 		},
 		{
 			// Test with two regions and two cursors
 			"one two three four",
-			[]Region{{0, 0}, {4, 7}, {9, 9}, {15, 16}},
+			[]text.Region{{0, 0}, {4, 7}, {9, 9}, {15, 16}},
 			"o one two fthreeur",
-			[]Region{{0, 1}, {2, 5}, {6, 9}, {11, 16}},
+			[]text.Region{{0, 1}, {2, 5}, {6, 9}, {11, 16}},
 		},
 	}
 
 	for i, test := range tests {
 		// Load the starting text into the buffer
 		e := v.BeginEdit()
-		v.Erase(e, Region{0, v.Size()})
+		v.Erase(e, text.Region{0, v.Size()})
 		v.Insert(e, 0, test.start)
 		v.EndEdit(e)
 
@@ -113,7 +113,7 @@ func TestTranspose(t *testing.T) {
 
 		ed.CommandHandler().RunTextCommand(v, "transpose", nil)
 
-		b := v.Substr(Region{0, v.Size()})
+		b := v.Substr(text.Region{0, v.Size()})
 		if b != test.expect {
 			t.Errorf("Test %d: Expected %q; got %q", i, test.expect, b)
 		}

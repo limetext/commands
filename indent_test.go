@@ -7,20 +7,20 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type indentTest struct {
-	text                     string
-	translate_tabs_to_spaces interface{}
-	tab_size                 interface{}
-	sel                      []Region
-	expect                   string
+	text                  string
+	translateTabsToSpaces interface{}
+	tabSize               interface{}
+	sel                   []text.Region
+	expect                string
 }
 
 func runIndentTest(t *testing.T, tests []indentTest, command string) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -40,16 +40,16 @@ func runIndentTest(t *testing.T, tests []indentTest, command string) {
 			v.Sel().Add(r)
 		}
 
-		if val, ok := test.translate_tabs_to_spaces.(bool); ok {
+		if val, ok := test.translateTabsToSpaces.(bool); ok {
 			v.Settings().Set("translate_tabs_to_spaces", val)
 		}
 
-		if val, ok := test.tab_size.(int); ok {
+		if val, ok := test.tabSize.(int); ok {
 			v.Settings().Set("tab_size", val)
 		}
 
 		ed.CommandHandler().RunTextCommand(v, command, nil)
-		if d := v.Substr(Region{0, v.Size()}); d != test.expect {
+		if d := v.Substr(text.Region{0, v.Size()}); d != test.expect {
 			t.Errorf("Test %d: Expected \n%q, but got \n%q", i, test.expect, d)
 		}
 	}
@@ -62,7 +62,7 @@ func TestIndent(t *testing.T) {
 			"a\n b\n  c\n   d\n",
 			false,
 			4,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"\ta\n b\n  c\n   d\n",
 		},
 		{ // translate_tabs_to_spaces = nil
@@ -70,7 +70,7 @@ func TestIndent(t *testing.T) {
 			"a\n b\n  c\n   d\n",
 			nil,
 			1,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"\ta\n b\n  c\n   d\n",
 		},
 		{ // translate_tabs_to_spaces = true and tab_size = 2
@@ -78,7 +78,7 @@ func TestIndent(t *testing.T) {
 			"a\n b\n  c\n   d\n",
 			true,
 			2,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"  a\n b\n  c\n   d\n",
 		},
 		{ // translate_tabs_to_spaces = true and tab_size = nil
@@ -86,7 +86,7 @@ func TestIndent(t *testing.T) {
 			"a\n b\n  c\n   d\n",
 			true,
 			nil,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"    a\n b\n  c\n   d\n",
 		},
 		{ // region include the 1st line and the 4th line
@@ -94,7 +94,7 @@ func TestIndent(t *testing.T) {
 			"a\n b\n  c\n   d\n",
 			false,
 			1,
-			[]Region{{0, 1}, {11, 12}},
+			[]text.Region{{0, 1}, {11, 12}},
 			"\ta\n b\n  c\n\t   d\n",
 		},
 		{ // region selected reversely
@@ -102,7 +102,7 @@ func TestIndent(t *testing.T) {
 			"a\n b\n  c\n   d\n",
 			false,
 			1,
-			[]Region{{3, 0}},
+			[]text.Region{{3, 0}},
 			"\ta\n\t b\n  c\n   d\n",
 		},
 	}
@@ -117,7 +117,7 @@ func TestUnindent(t *testing.T) {
 			"\ta\n  b\n      c\n\t  d\n",
 			false,
 			4,
-			[]Region{{0, 19}},
+			[]text.Region{{0, 19}},
 			"a\nb\n  c\n  d\n",
 		},
 		{ // translate_tabs_to_spaces = nil
@@ -125,7 +125,7 @@ func TestUnindent(t *testing.T) {
 			"\ta\n b\n  c\n   d\n",
 			nil,
 			1,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"a\n b\n  c\n   d\n",
 		},
 		{ // translate_tabs_to_spaces = true and tab_size = 2
@@ -133,7 +133,7 @@ func TestUnindent(t *testing.T) {
 			"  a\n b\n  c\n   d\n",
 			true,
 			2,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"a\n b\n  c\n   d\n",
 		},
 		{ // translate_tabs_to_spaces = true and tab_size = nil
@@ -141,7 +141,7 @@ func TestUnindent(t *testing.T) {
 			"    a\n b\n  c\n   d\n",
 			true,
 			nil,
-			[]Region{{0, 1}},
+			[]text.Region{{0, 1}},
 			"a\n b\n  c\n   d\n",
 		},
 		{ // region include the 1st line and the 4th line
@@ -149,7 +149,7 @@ func TestUnindent(t *testing.T) {
 			"\ta\n b\n  c\n \t   d\n",
 			false,
 			1,
-			[]Region{{0, 1}, {11, 12}},
+			[]text.Region{{0, 1}, {11, 12}},
 			"a\n b\n  c\n\t   d\n",
 		},
 		{ // region selected reversely
@@ -157,7 +157,7 @@ func TestUnindent(t *testing.T) {
 			"\ta\n\t b\n  c\n   d\n",
 			false,
 			4,
-			[]Region{{3, 0}},
+			[]text.Region{{3, 0}},
 			"a\n b\n  c\n   d\n",
 		},
 		{ // empty strings
@@ -165,7 +165,7 @@ func TestUnindent(t *testing.T) {
 			"",
 			false,
 			nil,
-			[]Region{{0, 0}},
+			[]text.Region{{0, 0}},
 			"",
 		},
 	}

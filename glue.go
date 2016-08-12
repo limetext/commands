@@ -7,54 +7,57 @@ package commands
 import (
 	"fmt"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
-const lime_cmd_mark = "lime.cmd.mark"
+const limeCmdMark = "lime.cmd.mark"
 
 type (
-	// The MarkUndoGroupsForGluingCommand marks the current position
+	// MarkUndoGroupsForGluing Command marks the current position
 	// in the undo stack as the start of commands to glue, potentially
 	// overwriting any existing marks.
 	MarkUndoGroupsForGluing struct {
-		BypassUndoCommand
+		backend.BypassUndoCommand
 	}
 
-	// The GlueMarkedUndoGroupsCommand merges commands from the previously
+	// GlueMarkedUndoGroups Command merges commands from the previously
 	// marked undo stack location to the current location into a single
 	// entry in the undo stack.
 	GlueMarkedUndoGroups struct {
-		BypassUndoCommand
+		backend.BypassUndoCommand
 	}
 
-	// The MaybeMarkUndoGroupsForGluingCommand is similar to
+	// MaybeMarkUndoGroupsForGluing Command is similar to
 	// MarkUndoGroupsForGluingCommand with the exception that if there
 	// is already a mark set, it is not overwritten.
 	MaybeMarkUndoGroupsForGluing struct {
-		BypassUndoCommand
+		backend.BypassUndoCommand
 	}
 
-	// The UnmarkUndoGroupsForGluingCommand removes the glue mark set by
+	// UnmarkUndoGroupsForGluing Command removes the glue mark set by
 	// either MarkUndoGroupsForGluingCommand or MaybeMarkUndoGroupsForGluingCommand
 	// if it was set.
 	UnmarkUndoGroupsForGluing struct {
-		BypassUndoCommand
+		backend.BypassUndoCommand
 	}
 )
 
-func (c *MarkUndoGroupsForGluing) Run(v *View, e *Edit) error {
-	v.Settings().Set(lime_cmd_mark, v.UndoStack().Position())
+// Run executes the MarkUndoGroupsForGluing command.
+func (c *MarkUndoGroupsForGluing) Run(v *backend.View, e *backend.Edit) error {
+	v.Settings().Set(limeCmdMark, v.UndoStack().Position())
 	return nil
 }
 
-func (c *UnmarkUndoGroupsForGluing) Run(v *View, e *Edit) error {
-	v.Settings().Erase(lime_cmd_mark)
+// Run executes the UnmarkUndoGroupsForGluing command.
+func (c *UnmarkUndoGroupsForGluing) Run(v *backend.View, e *backend.Edit) error {
+	v.Settings().Erase(limeCmdMark)
 	return nil
 }
 
-func (c *GlueMarkedUndoGroups) Run(v *View, e *Edit) error {
+// Run executes the GlueMarkedUndoGroups command.
+func (c *GlueMarkedUndoGroups) Run(v *backend.View, e *backend.Edit) error {
 	pos := v.UndoStack().Position()
-	mark, ok := v.Settings().Get(lime_cmd_mark).(int)
+	mark, ok := v.Settings().Get(limeCmdMark).(int)
 	if !ok {
 		return fmt.Errorf("No mark in the current view")
 	}
@@ -64,15 +67,16 @@ func (c *GlueMarkedUndoGroups) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *MaybeMarkUndoGroupsForGluing) Run(v *View, e *Edit) error {
-	if !v.Settings().Has(lime_cmd_mark) {
-		v.Settings().Set(lime_cmd_mark, v.UndoStack().Position())
+// Run executes the MaybeMarkUndoGroupsForGluing command.
+func (c *MaybeMarkUndoGroupsForGluing) Run(v *backend.View, e *backend.Edit) error {
+	if !v.Settings().Has(limeCmdMark) {
+		v.Settings().Set(limeCmdMark, v.UndoStack().Position())
 	}
 	return nil
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&MarkUndoGroupsForGluing{},
 		&GlueMarkedUndoGroups{},
 		&MaybeMarkUndoGroupsForGluing{},

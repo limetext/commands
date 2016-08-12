@@ -5,23 +5,25 @@
 package commands
 
 import (
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type (
-	// The SingleSelectionCommand merges multiple cursors
+	// SingleSelection command merges multiple cursors
 	// into a single one.
 	SingleSelection struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
-	// The SelectAllCommand selects the whole buffer of the current file
+	// SelectAll command selects the whole buffer of
+	// the current file.
 	SelectAll struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *SingleSelection) Run(v *View, e *Edit) error {
+// Run executes the SingleSelection command.
+func (c *SingleSelection) Run(v *backend.View, e *backend.Edit) error {
 	/*
 		Correct behavior of SingleSelect:
 			- Remove all selection regions but the first.
@@ -33,20 +35,21 @@ func (c *SingleSelection) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SelectAll) Run(v *View, e *Edit) error {
+// Run executes the SelectAll command.
+func (c *SelectAll) Run(v *backend.View, e *backend.Edit) error {
 	/*
 		Correct behavior of SelectAll:
 			- Select a single region of (0, view.buffersize())
 	*/
 
-	r := Region{0, v.Size()}
+	r := text.Region{0, v.Size()}
 	v.Sel().Clear()
 	v.Sel().Add(r)
 	return nil
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&SingleSelection{},
 		&SelectAll{},
 	})

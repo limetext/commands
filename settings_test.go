@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 func TestToggleSetting(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -26,32 +26,32 @@ func TestToggleSetting(t *testing.T) {
 	v.Settings().Set("favorite_color", "blue")
 
 	// non-existant -> true
-	ed.CommandHandler().RunTextCommand(v, "toggle_setting", Args{"setting": "rabbit"})
+	ed.CommandHandler().RunTextCommand(v, "toggle_setting", backend.Args{"setting": "rabbit"})
 	if val, ok := v.Settings().Get("rabbit").(bool); !ok || !val {
 		t.Errorf("Toggling an non-existant setting should make it true")
 	}
 
 	// non-bool -> true
-	ed.CommandHandler().RunTextCommand(v, "toggle_setting", Args{"setting": "favorite_color"})
+	ed.CommandHandler().RunTextCommand(v, "toggle_setting", backend.Args{"setting": "favorite_color"})
 	if val, ok := v.Settings().Get("favorite_color").(bool); !ok || !val {
 		t.Errorf("Toggling an non-bool setting should make it true")
 	}
 
 	// bool: true -> false
-	ed.CommandHandler().RunTextCommand(v, "toggle_setting", Args{"setting": "duck"})
+	ed.CommandHandler().RunTextCommand(v, "toggle_setting", backend.Args{"setting": "duck"})
 	if val, ok := v.Settings().Get("duck").(bool); !ok || val {
 		t.Errorf("Setting should be toggled from true to false")
 	}
 
 	// bool: false -> true
-	ed.CommandHandler().RunTextCommand(v, "toggle_setting", Args{"setting": "witch"})
+	ed.CommandHandler().RunTextCommand(v, "toggle_setting", backend.Args{"setting": "witch"})
 	if val, ok := v.Settings().Get("witch").(bool); !ok || !val {
 		t.Errorf("Setting should be toggled from false to true")
 	}
 }
 
 func TestSetSetting(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 
@@ -63,7 +63,7 @@ func TestSetSetting(t *testing.T) {
 	v.Settings().Set("favorite_color", "blue")
 
 	exp := "red"
-	ed.CommandHandler().RunTextCommand(v, "set_setting", Args{"setting": "favorite_color", "value": exp})
+	ed.CommandHandler().RunTextCommand(v, "set_setting", backend.Args{"setting": "favorite_color", "value": exp})
 	val := v.Settings().Get("favorite_color")
 	if s, ok := val.(string); !ok || s != exp {
 		t.Errorf("Expecting setting value to be %#v, was %#v", exp, val)
@@ -79,7 +79,7 @@ func TestToggles(t *testing.T) {
 }
 
 func toggleTest(t *testing.T, name string) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 

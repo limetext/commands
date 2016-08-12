@@ -8,45 +8,46 @@ import (
 	"strings"
 	"unicode"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 type (
-	// The TitleCaseCommand transforms all selections
+	// TitleCase Command transforms all selections
 	// to be in Title Case.  For instance, the text:
 	// "this is some sample text"
 	// turns in to:
-	// "This Is Some Sample Text"
+	// "This Is Some Sample Text".
 	TitleCase struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The SwapCaseCommand transforms all selections
+	// SwapCase Command transforms all selections
 	// so that each character in the selection
 	// is the opposite case.  For example, the text:
 	// "Hello, World!"
 	// turns in to:
-	// "hELLO, wORLD!"
+	// "hELLO, wORLD!".
 	SwapCase struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The UpperCaseCommand transforms all selections
+	// UpperCase Command transforms all selections
 	// so that each character in the selection
 	// is in its upper case equivalent (if any.)
 	UpperCase struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The LowerCaseCommand transforms all selections
+	// LowerCase Command transforms all selections
 	// so that each character in the selection
-	// is in its lower case equivalent
+	// is in its lower case equivalent.
 	LowerCase struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
-func (c *TitleCase) Run(v *View, e *Edit) error {
+// Run executes the TitleCase command.
+func (c *TitleCase) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -58,7 +59,8 @@ func (c *TitleCase) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *SwapCase) Run(v *View, e *Edit) error {
+// Run executes the SwapCase command.
+func (c *SwapCase) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -79,7 +81,8 @@ func (c *SwapCase) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *UpperCase) Run(v *View, e *Edit) error {
+// Run executes the UpperCase command.
+func (c *UpperCase) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -91,7 +94,8 @@ func (c *UpperCase) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *LowerCase) Run(v *View, e *Edit) error {
+// Run executes the LowerCase command.
+func (c *LowerCase) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	for i := 0; i < sel.Len(); i++ {
 		r := sel.Get(i)
@@ -104,7 +108,7 @@ func (c *LowerCase) Run(v *View, e *Edit) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&TitleCase{},
 		&SwapCase{},
 		&UpperCase{},

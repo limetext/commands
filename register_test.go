@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 type DummyApplicationCommand struct {
-	DefaultCommand
+	backend.DefaultCommand
 }
 
 func (c *DummyApplicationCommand) Run() error {
@@ -24,7 +24,7 @@ func (c *DummyApplicationCommand) IsChecked() bool {
 }
 
 func TestRegisterByName(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 
 	name := "dummy"
 
@@ -42,14 +42,14 @@ func TestRegisterByName(t *testing.T) {
 }
 
 func TestRegister(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ac := &DummyApplicationCommand{}
 
-	register([]Command{
+	register([]backend.Command{
 		ac,
 	})
 
-	name := DefaultName(ac)
+	name := backend.DefaultName(ac)
 	err := ed.CommandHandler().RunApplicationCommand(name, nil)
 
 	if err == nil {

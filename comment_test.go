@@ -7,7 +7,7 @@ package commands
 import (
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 	"github.com/limetext/text"
 )
 
@@ -91,7 +91,7 @@ func TestToggleComment(t *testing.T) {
 		},
 	}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
 

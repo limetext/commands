@@ -7,33 +7,33 @@ package commands
 import (
 	"errors"
 
-	. "github.com/limetext/backend"
-	. "github.com/limetext/text"
+	"github.com/limetext/backend"
+	"github.com/limetext/text"
 )
 
 type (
-	// The FindUnderExpandCommand extends the selection to the current word
+	// FindUnderExpand Command extends the selection to the current word
 	// if the current selection region is empty.
 	// If one character or more is selected, the text buffer is scanned for
 	// the next occurrence of the selection and that region too is added to
 	// the selection set.
 	FindUnderExpand struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
-	// The FindNext command searches for the last search term, starting at
+	// FindNext command searches for the last search term, starting at
 	// the end of the last selection in the buffer, and wrapping around. If
 	// it finds the term, it clears the current selections and selects the
 	// newly-found regions.
 	FindNext struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 
-	// The ReplaceNextCommand searches for the "old" argument text,
+	// ReplaceNext Command searches for the "old" argument text,
 	// and at the first occurance of the text, replaces it with the
 	// "new" argument text. If there are multiple regions, the find
 	// starts from the max region.
 	ReplaceNext struct {
-		DefaultCommand
+		backend.DefaultCommand
 	}
 )
 
@@ -43,7 +43,8 @@ var (
 	replaceText string
 )
 
-func (c *FindUnderExpand) Run(v *View, e *Edit) error {
+// Run executes the FindUnderExpand command.
+func (c *FindUnderExpand) Run(v *backend.View, e *backend.Edit) error {
 	sel := v.Sel()
 	rs := sel.Regions()
 
@@ -60,14 +61,14 @@ func (c *FindUnderExpand) Run(v *View, e *Edit) error {
 	}
 	last := rs[len(rs)-1]
 	lastSearch = v.SubstrR(last)
-	r := v.Find(string(lastSearch), last.End(), IGNORECASE|LITERAL)
+	r := v.Find(string(lastSearch), last.End(), backend.IGNORECASE|backend.LITERAL)
 	if r.A != -1 {
 		sel.Add(r)
 	}
 	return nil
 }
 
-func nextSelection(v *View, search string) (Region, error) {
+func nextSelection(v *backend.View, search string) (text.Region, error) {
 	sel := v.Sel()
 	rs := sel.Regions()
 	last := 0
@@ -75,25 +76,26 @@ func nextSelection(v *View, search string) (Region, error) {
 
 	// Regions are not sorted, so finding the last one requires a search.
 	for _, r := range rs {
-		last = Max(last, r.End())
+		last = text.Max(last, r.End())
 	}
 
 	// Start the search right after the last selection.
 	start := last
-	r := v.Find(search, start, IGNORECASE|LITERAL)
+	r := v.Find(search, start, backend.IGNORECASE|backend.LITERAL)
 	// If not found yet and find_wrap setting is true, search
 	// from the start of the buffer to our original starting point.
 	if r.A == -1 && wrap {
-		r = v.Find(search, 0, IGNORECASE|LITERAL)
+		r = v.Find(search, 0, backend.IGNORECASE|backend.LITERAL)
 	}
 	// If we found our string, select it.
 	if r.A != -1 {
 		return r, nil
 	}
-	return Region{-1, -1}, errors.New("Selection not Found")
+	return text.Region{-1, -1}, errors.New("Selection not Found")
 }
 
-func (c *FindNext) Run(v *View, e *Edit) error {
+// Run executes the FindNext command.
+func (c *FindNext) Run(v *backend.View, e *backend.Edit) error {
 	/*
 		Correct behavior of FindNext:
 			- If there is no previous search, do nothing
@@ -119,7 +121,8 @@ func (c *FindNext) Run(v *View, e *Edit) error {
 	return nil
 }
 
-func (c *ReplaceNext) Run(v *View, e *Edit) error {
+// Run executes the ReplaceNext command.
+func (c *ReplaceNext) Run(v *backend.View, e *backend.Edit) error {
 	// use selection function from find.go to get the next region
 	selection, err := nextSelection(v, string(lastSearch))
 	if err != nil {
@@ -131,7 +134,7 @@ func (c *ReplaceNext) Run(v *View, e *Edit) error {
 }
 
 func init() {
-	register([]Command{
+	register([]backend.Command{
 		&FindUnderExpand{},
 		&FindNext{},
 		&ReplaceNext{},

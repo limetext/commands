@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	. "github.com/limetext/backend"
+	"github.com/limetext/backend"
 )
 
 func TestNewFile(t *testing.T) {
-	ed := GetEditor()
+	ed := backend.GetEditor()
 
 	w := ed.NewWindow()
 	defer w.Close()
@@ -36,7 +36,7 @@ func TestOpenFile(t *testing.T) {
 	const testPath = "file_test.go"
 	fe.files = []string{testPath}
 
-	ed := GetEditor()
+	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
 	w := ed.NewWindow()
 	defer w.Close()
