@@ -32,7 +32,7 @@ func (c *DoSomething) Run(v *backend.View, e *backend.Edit) error {
 }
 ```
 
-Commands need to be registered with the backend via the init function before it can be executed by plugins.
+Commands need to be registered with the backend via the `init` function before it can be executed by plugins.
 
 ```go
 func init() {
