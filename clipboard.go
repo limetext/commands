@@ -104,20 +104,29 @@ func (c *Cut) Run(v *backend.View, e *backend.Edit) error {
 
 // Run executes the Paste command.
 func (c *Paste) Run(v *backend.View, e *backend.Edit) error {
-	// TODO: Paste the entire line on the line before the cursor if a
-	//		 line was autocopied.
-
 	ed := backend.GetEditor()
 
 	rs := &text.RegionSet{}
 	regions := v.Sel().Regions()
-	sort.Sort(sort.Reverse(regionSorter(regions)))
+	sort.Sort(regionSorter(regions))
 	rs.AddAll(regions)
 
-	s, _ := ed.GetClipboard()
+	s, ex := ed.GetClipboard()
 
-	for _, r := range rs.Regions() {
-		v.Replace(e, r, s)
+	ss := strings.Split(s, "\n")
+	split := !ex && len(ss) == rs.Len()
+
+	for i := rs.Len() - 1; i >= 0; i-- {
+		r := rs.Get(i)
+
+		if split {
+			v.Replace(e, r, ss[i])
+		} else if !ex {
+			v.Replace(e, r, s)
+		} else {
+			l := v.FullLineR(r)
+			v.Insert(e, l.Begin(), s)
+		}
 	}
 
 	return nil
