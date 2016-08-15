@@ -56,20 +56,21 @@ func getRegions(v *backend.View, cut bool) *text.RegionSet {
 	return rs
 }
 
-func getSelSubstrs(v *backend.View, rs *text.RegionSet) (s []string, ex bool) {
-	s = make([]string, len(rs.Regions()))
+func getSelForCopy(v *backend.View, rs *text.RegionSet) (s string, ex bool) {
+	ss := make([]string, rs.Len())
 
 	for i, r := range rs.Regions() {
-		add := ""
-		s1 := v.Substr(r)
+		sub := v.Substr(r)
 
-		if !v.Sel().HasNonEmpty() && !strings.HasSuffix(s1, "\n") {
-			add = "\n"
+		if !v.Sel().HasNonEmpty() && !strings.HasSuffix(sub, "\n") {
+			sub += "\n"
 			ex = true
 		}
 
-		s[i] = s1 + add
+		ss[i] = sub
 	}
+
+	s = strings.Join(ss, "\n")
 
 	return
 }
@@ -77,16 +78,16 @@ func getSelSubstrs(v *backend.View, rs *text.RegionSet) (s []string, ex bool) {
 // Run executes the Copy command.
 func (c *Copy) Run(v *backend.View, e *backend.Edit) error {
 	rs := getRegions(v, false)
-	s, ex := getSelSubstrs(v, rs)
+	s, ex := getSelForCopy(v, rs)
 
-	backend.GetEditor().SetClipboard(strings.Join(s, "\n"), ex)
+	backend.GetEditor().SetClipboard(s, ex)
 
 	return nil
 }
 
 // Run executes the Cut command.
 func (c *Cut) Run(v *backend.View, e *backend.Edit) error {
-	s, ex := getSelSubstrs(v, getRegions(v, false))
+	s, ex := getSelForCopy(v, getRegions(v, false))
 
 	rs := getRegions(v, true)
 	regions := rs.Regions()
@@ -96,7 +97,7 @@ func (c *Cut) Run(v *backend.View, e *backend.Edit) error {
 		v.Erase(e, r)
 	}
 
-	backend.GetEditor().SetClipboard(strings.Join(s, "\n"), ex)
+	backend.GetEditor().SetClipboard(s, ex)
 
 	return nil
 }
