@@ -145,6 +145,108 @@ func TestSelectLines(t *testing.T) {
 	}
 }
 
+func TestDuplicateLine(t *testing.T) {
+	tests := []struct {
+		text    string
+		sel     []text.Region
+		expText string
+		expSel  []text.Region
+	}{
+		{
+			"a",
+			[]text.Region{{0, 0}},
+			"a\na",
+			[]text.Region{{2, 2}},
+		},
+		{
+			"ab",
+			[]text.Region{{0, 0}, {1, 1}},
+			"ab\nab\nab",
+			[]text.Region{{6, 6}, {7, 7}},
+		},
+		{
+			"a\nb",
+			[]text.Region{{0, 0}, {2, 2}},
+			"a\na\nb\nb",
+			[]text.Region{{2, 2}, {6, 6}},
+		},
+		{
+			"a",
+			[]text.Region{{0, 1}},
+			"aa",
+			[]text.Region{{1, 2}},
+		},
+		{
+			"abc",
+			[]text.Region{{0, 1}},
+			"aabc",
+			[]text.Region{{1, 2}},
+		},
+		{
+			"abc",
+			[]text.Region{{1, 3}},
+			"abcbc",
+			[]text.Region{{3, 5}},
+		},
+		{
+			"abc\nde",
+			[]text.Region{{1, 3}, {4, 5}},
+			"abcbc\ndde",
+			[]text.Region{{3, 5}, {7, 8}},
+		},
+		{
+			"abc\nde",
+			[]text.Region{{1, 3}, {4, 4}},
+			"abcbc\nde\nde",
+			[]text.Region{{3, 5}, {9, 9}},
+		},
+	}
+
+	ed := backend.GetEditor()
+	w := ed.NewWindow()
+	defer w.Close()
+
+	for i, test := range tests {
+		v := w.NewFile()
+		defer func() {
+			v.SetScratch(true)
+			v.Close()
+		}()
+
+		e := v.BeginEdit()
+		v.Insert(e, 0, test.text)
+		v.EndEdit(e)
+
+		v.Sel().Clear()
+		v.Sel().AddAll(test.sel)
+
+		ed.CommandHandler().RunTextCommand(v, "duplicate_line", nil)
+		if d := v.Substr(text.Region{0, v.Size()}); d != test.expText {
+			t.Errorf("Test %d:\nExcepted: '%s'\nbut got: '%s'", i, test.expText, d)
+		}
+
+		d := v.Sel()
+		if d.Len() != len(test.expSel) {
+			t.Errorf("Test %d: Expected '%d' regions, but got '%d' regions", i, len(test.expSel), d.Len())
+			t.Errorf("%+v, %+v", test.expSel, d.Regions())
+		} else {
+			var found bool
+			for _, r := range test.expSel {
+				found = false
+				for _, r2 := range d.Regions() {
+					if r2 == r {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("Test %d:\nRegion %+v not found in view regions: %+v", i, r, d.Regions())
+				}
+			}
+		}
+	}
+}
+
 func TestSwapLine(t *testing.T) {
 	type SwapLineTest struct {
 		text   string

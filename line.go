@@ -12,6 +12,15 @@ import (
 )
 
 type (
+	// Duplicate copies all of the current selections,
+	// inserting each copy before the original. If any
+	// of the selections are empty, instead, the entire
+	// line containing that cursor is copied and inserted
+	// before the original.
+	DuplicateLine struct {
+		backend.DefaultCommand
+	}
+
 	// JoinLines removes every new line in the
 	// selections and the first new line after.
 	JoinLines struct {
@@ -19,18 +28,19 @@ type (
 	}
 
 	// SelectLines makes the selection fill the lines
-	// covered by it currently
+	// covered by it currently.
 	SelectLines struct {
 		backend.DefaultCommand
 		Forward bool
 	}
-	// SwapLineUp swaps the currently selected lines with the ones above
+
+	// SwapLineUp swaps the currently selected lines with the ones above.
 	SwapLineUp struct {
 		backend.DefaultCommand
 	}
 
 	// SwapLineDown swaps the currently selected
-	// lines with the ones below
+	// lines with the ones below.
 	SwapLineDown struct {
 		backend.DefaultCommand
 	}
@@ -41,6 +51,33 @@ type (
 		backend.DefaultCommand
 	}
 )
+
+// Run executes the DuplicateLine command.
+func (c *DuplicateLine) Run(v *backend.View, e *backend.Edit) error {
+	// v.Sel() is the RegionSet, a collection of Regions representing
+	// the current selections
+	sel := v.Sel()
+	// when we have multiple cursors in the document,
+	// we will interate through each cursor
+
+	for i := 0; i < sel.Len(); i++ {
+		// Selection of a cursor
+		r := sel.Get(i)
+		suffix := ""
+
+		// If the selection is empty
+		// then we want to duplicate the entire line
+		if r.Empty() {
+			r = v.Line(r.End())
+			suffix = "\n"
+		}
+
+		t := v.Substr(r) + suffix
+		v.Insert(e, r.Begin(), t)
+	}
+
+	return nil
+}
 
 // Run executes the JoinLines command.
 func (c *JoinLines) Run(v *backend.View, e *backend.Edit) error {
@@ -140,7 +177,7 @@ func (c *SelectLines) Run(v *backend.View, e *backend.Edit) error {
 			l = v.Line(line.Begin() - 1)
 			d = r.Begin() - line.Begin()
 		}
-		// If the next line lenght is more than the calculated distance
+		// If the next line length is more than the calculated distance
 		// Put new region at the exact distance
 		// If not put region at the end of the next|before line
 		if l.Size() < d {
@@ -184,5 +221,6 @@ func init() {
 		&SwapLineUp{},
 		&SwapLineDown{},
 		&SplitSelectionIntoLines{},
+		&DuplicateLine{},
 	})
 }
