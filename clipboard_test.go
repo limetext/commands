@@ -21,7 +21,8 @@ type copyTest struct {
 
 var dummyClipboard string
 
-func runCopyTest(command string, tests *[]copyTest, t *testing.T) {
+// TODO: Also test where the cursors end up.
+func runClipboardTest(command string, tests *[]copyTest, t *testing.T) {
 	ed := GetEditor()
 	ed.SetClipboardFuncs(func(n string) (err error) {
 		dummyClipboard = n
@@ -132,7 +133,7 @@ func TestCopy(t *testing.T) {
 		},
 	}
 
-	runCopyTest("copy", &tests, t)
+	runClipboardTest("copy", &tests, t)
 }
 
 func TestCut(t *testing.T) {
@@ -209,7 +210,7 @@ func TestCut(t *testing.T) {
 		},
 	}
 
-	runCopyTest("cut", &tests, t)
+	runClipboardTest("cut", &tests, t)
 }
 
 func TestPaste(t *testing.T) {
@@ -265,5 +266,5 @@ func TestPaste(t *testing.T) {
 		},
 	}
 
-	runCopyTest("paste", &tests, t)
+	runClipboardTest("paste", &tests, t)
 }
