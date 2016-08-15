@@ -20,17 +20,19 @@ type (
 		backend.DefaultCommand
 	}
 
-	// Cut copies the current selection to the clipboard, removing it from the buffer.
-	// If there are multiple selections, they are concatenated in order from top to
-	// bottom of the file, separated by newlines.
+	// Cut copies the current selection to the clipboard, removing it from the
+	// buffer. If there are multiple selections, they are concatenated in order
+	// from top to bottom of the file, separated by newlines.
 	Cut struct {
 		backend.DefaultCommand
 	}
 
-	// Paste pastes the contents of the clipboard, overwriting the current selection,
-	// if any. If there are multiple selections, the clipboard is split into lines.
-	// If the number of lines equals the number of selections, the lines are pasted
-	// separately into each selection in order from top to bottom of the file.
+	// Paste pastes the contents of the clipboard, overwriting the current
+	// selection, if any. If there are multiple selections, the clipboard is
+	// split into lines. If the number of lines equals the number of selections,
+	// the lines are pasted separately into each selection in order from top to
+	// bottom of the file. Otherwise the entire clipboard is pasted over every
+	// selection.
 	Paste struct {
 		backend.DefaultCommand
 	}
