@@ -11,30 +11,41 @@ import (
 	"github.com/limetext/text"
 )
 
-type copyTest struct {
-	buf             string
-	clip            string
-	autoExpanded    bool
-	regions         []text.Region
-	expClip         string
-	expAutoExpanded bool
-	expBuf          string
+type (
+	dummyClipboard struct {
+		cachedText   string
+		autoExpanded bool
+	}
+
+	copyTest struct {
+		buf             string
+		clip            string
+		autoExpanded    bool
+		regions         []text.Region
+		expClip         string
+		expAutoExpanded bool
+		expBuf          string
+	}
+)
+
+func (c *dummyClipboard) Get() (string, bool) {
+	return c.cachedText, c.autoExpanded
 }
 
-var dummyClipboard string
+func (c *dummyClipboard) Set(s string, b bool) {
+	c.cachedText = s
+	c.autoExpanded = b
+}
 
 // TODO: Also test where the cursors end up.
 func runClipboardTest(command string, tests *[]copyTest, t *testing.T) {
 	ed := GetEditor()
-	ed.SetClipboardFuncs(func(n string) (err error) {
-		dummyClipboard = n
-		return nil
-	}, func() (string, error) {
-		return dummyClipboard, nil
-	})
 
 	w := ed.NewWindow()
 	defer w.Close()
+
+	cb := &dummyClipboard{}
+	ed.UseClipboard(cb)
 
 	for i, test := range *tests {
 		v := w.NewFile()
@@ -48,7 +59,7 @@ func runClipboardTest(command string, tests *[]copyTest, t *testing.T) {
 		v.EndEdit(edit)
 		v.Sel().Clear()
 
-		ed.SetClipboard(test.clip, test.autoExpanded)
+		cb.Set(test.clip, test.autoExpanded)
 
 		for _, r := range test.regions {
 			v.Sel().Add(r)
@@ -56,7 +67,7 @@ func runClipboardTest(command string, tests *[]copyTest, t *testing.T) {
 
 		ed.CommandHandler().RunTextCommand(v, command, nil)
 
-		clip, auto := ed.GetClipboard()
+		clip, auto := cb.Get()
 
 		if clip != test.expClip {
 			t.Errorf("Test %d: Expected clipboard to be %q, but got %q", i, test.expClip, clip)

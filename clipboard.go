@@ -80,7 +80,8 @@ func (c *Copy) Run(v *backend.View, e *backend.Edit) error {
 	rs := getRegions(v, false)
 	s, ex := getSelForCopy(v, rs)
 
-	backend.GetEditor().SetClipboard(s, ex)
+	cb := backend.GetEditor().Clipboard()
+	cb.Set(s, ex)
 
 	return nil
 }
@@ -97,21 +98,22 @@ func (c *Cut) Run(v *backend.View, e *backend.Edit) error {
 		v.Erase(e, r)
 	}
 
-	backend.GetEditor().SetClipboard(s, ex)
+	cb := backend.GetEditor().Clipboard()
+	cb.Set(s, ex)
 
 	return nil
 }
 
 // Run executes the Paste command.
 func (c *Paste) Run(v *backend.View, e *backend.Edit) error {
-	ed := backend.GetEditor()
+	cb := backend.GetEditor().Clipboard()
 
 	rs := &text.RegionSet{}
 	regions := v.Sel().Regions()
 	sort.Sort(regionSorter(regions))
 	rs.AddAll(regions)
 
-	s, ex := ed.GetClipboard()
+	s, ex := cb.Get()
 
 	ss := strings.Split(s, "\n")
 	split := !ex && len(ss) == rs.Len()
