@@ -39,9 +39,10 @@ func TestCloseAll(t *testing.T) {
 
 func TestCloseWindow(t *testing.T) {
 	ed := backend.GetEditor()
-	w := ed.NewWindow()
+	w1 := ed.NewWindow()
+	_ = ed.NewWindow()
 	l := len(ed.Windows())
-	ed.CommandHandler().RunWindowCommand(w, "close_window", nil)
+	ed.CommandHandler().RunWindowCommand(w1, "close_window", nil)
 
 	if len(ed.Windows()) != l-1 {
 		t.Errorf("Expected %d window, but got %d", l-1, len(ed.Windows()))
@@ -60,11 +61,15 @@ func TestNewAppWindow(t *testing.T) {
 
 func TestCloseAppWindow(t *testing.T) {
 	ed := backend.GetEditor()
-	_ = ed.NewWindow()
+	tmp := ed.NewWindow().Id()
 	l := len(ed.Windows())
+
 	ed.CommandHandler().RunApplicationCommand("close_window", nil)
 
 	if len(ed.Windows()) != l-1 {
 		t.Errorf("Expected %d window, but got %d", l-1, len(ed.Windows()))
+	}
+	if ed.ActiveWindow().Id() == tmp {
+		t.Error(`The active window should not be the same but it is`)
 	}
 }

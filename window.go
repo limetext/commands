@@ -51,8 +51,7 @@ func (c *CloseAll) Run(w *backend.Window) error {
 
 // Run executes the CloseWindow command.
 func (c *CloseWindow) Run(w *backend.Window) error {
-	ed := backend.GetEditor()
-	ed.ActiveWindow().Close()
+	w.Close()
 	return nil
 }
 
