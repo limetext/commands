@@ -6,7 +6,7 @@ package commands
 
 import (
 	"errors"
-
+	// "fmt"
 	"github.com/limetext/backend"
 	"github.com/limetext/text"
 )
@@ -34,6 +34,17 @@ type (
 	// starts from the max region.
 	ReplaceNext struct {
 		backend.DefaultCommand
+	}
+
+	FindAll struct{
+		backend.DefaultCommand
+		SearchText []rune
+	}
+
+	ReplaceAll struct{
+		backend.DefaultCommand
+		SearchText []rune
+		ReplaceText []rune
 	}
 )
 
@@ -68,6 +79,7 @@ func (c *FindUnderExpand) Run(v *backend.View, e *backend.Edit) error {
 	return nil
 }
 
+
 func nextSelection(v *backend.View, search string) (text.Region, error) {
 	sel := v.Sel()
 	rs := sel.Regions()
@@ -92,6 +104,30 @@ func nextSelection(v *backend.View, search string) (text.Region, error) {
 		return r, nil
 	}
 	return text.Region{-1, -1}, errors.New("Selection not Found")
+}
+
+func (c *FindAll) Run(v *backend.View, e *backend.Edit) error{
+	if len(c.SearchText) == 0 {
+		return nil
+	}
+	/* Original state of find_wrap is stored and then is made false so that nextSection doesn't go into an infinate loop.
+	   Later in the end, it is returned to it's original state.
+	*/
+	wrap := v.Settings().Bool("find_wrap")
+	v.Settings().Set("find_wrap", false)
+	search := string(c.SearchText)
+	sel := v.Sel() 
+	sel.Clear()
+	for {
+		selection, err := nextSelection(v, search)
+		if err != nil {
+			break
+		}
+		sel.Add(selection)
+	}
+	v.Settings().Set("find_wrap", wrap)
+	return nil
+
 }
 
 // Run executes the FindNext command.
@@ -121,6 +157,34 @@ func (c *FindNext) Run(v *backend.View, e *backend.Edit) error {
 	return nil
 }
 
+func (c *ReplaceAll) Run(v *backend.View, e *backend.Edit) error{
+	if len(c.SearchText) == 0 {
+		return nil
+	}
+	search := string(c.SearchText)
+	replace := string(c.ReplaceText)
+	sel := v.Sel() 
+	sel.Clear()
+	/* Original state of find_wrap is stored and then is made false so that nextSection doesn't go into an infinate loop.
+	   Later in the end, it is returned to it's original state.
+	*/
+	wrap := v.Settings().Bool("find_wrap")
+	v.Settings().Set("find_wrap", false)
+	for {
+		selection, err := nextSelection(v, string(search))
+		if err != nil {
+			break
+		}
+		v.Erase(e, selection)
+		v.Insert(e, selection.Begin(), replace)
+		sel := v.Sel()
+		sel.Clear()
+		sel.Add(text.Region{selection.Begin(),selection.Begin()+len(replace)})
+	}
+	v.Settings().Set("find_wrap", wrap)
+	return nil
+}
+
 // Run executes the ReplaceNext command.
 func (c *ReplaceNext) Run(v *backend.View, e *backend.Edit) error {
 	// use selection function from find.go to get the next region
@@ -138,5 +202,7 @@ func init() {
 		&FindUnderExpand{},
 		&FindNext{},
 		&ReplaceNext{},
+		&ReplaceAll{},
+		&FindAll{},
 	})
 }

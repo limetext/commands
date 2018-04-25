@@ -99,6 +99,116 @@ func TestFindNext(t *testing.T) {
 	runFindTest(tests, t, "find_under_expand", "find_next")
 }
 
+type replaceAllTest struct{
+	find string
+	replace string
+	in string
+	exp string
+}
+
+func TestReplaceAll(t *testing.T) {
+	tests := []replaceAllTest{
+		{
+			"abc",
+			"cba",
+			"abc abc bac abc abc",
+			"cba cba bac cba cba",
+		},
+		{
+			"abc",
+			"d",
+			"abc agf bac ac abc",
+			"d agf bac ac d",
+		},
+		{
+			"//",
+			"#",
+			"//This is a comment //Test Comment",
+			"#This is a comment #Test Comment",
+		},
+	}
+
+	runReplaceAllTest(tests, t,"replace_all")
+}
+
+func runReplaceAllTest(tests []replaceAllTest, t *testing.T,commands ...string) {
+	ed := backend.GetEditor()
+	w := ed.NewWindow()
+
+	v := w.NewFile()
+	v.Settings().Set("find_wrap", false)
+
+	for i,test := range tests {
+		e := v.BeginEdit()
+		v.Insert(e,0,test.in)
+		v.EndEdit(e)
+		v.Sel().Clear()
+		for _, command := range commands {
+			ed.CommandHandler().RunTextCommand(v, command, backend.Args{"search_text":[]rune(test.find),"replace_text":[]rune(test.replace)})
+		}
+		if out := v.Substr(text.Region{0, v.Size()}); out != test.exp {
+			t.Errorf("Test %d failed: %s", i, out)
+		}
+		e = v.BeginEdit()
+		v.Erase(e, text.Region{0, v.Size()})
+		v.EndEdit(e)
+	}
+}
+
+type findAllTest struct{
+	find string
+	in string
+	exp []text.Region
+	fw bool
+}
+
+func TestFindAll(t *testing.T) {
+	tests := []findAllTest{
+		{
+			"abc",
+			"abc cde dce abc abc",
+			[]text.Region{{0, 3}, {12, 15}, {16, 19}},
+			true,
+
+		},
+		{
+			",\n",
+			"abc,\nbca,\n,cde,\n",
+			[]text.Region{{3,5},{8,10},{14,16}},
+			false,
+		},
+	}
+	runFindAllTest(tests, t, "find_all")
+}
+
+func runFindAllTest(tests []findAllTest, t *testing.T, commands ...string){
+	ed := backend.GetEditor()
+	w := ed.NewWindow()
+	defer w.Close()
+	v := w.NewFile()
+	defer func() {
+		v.SetScratch(true)
+		v.Close()
+	}()
+
+	for i, test := range tests {
+		e := v.BeginEdit()
+		v.Insert(e, 0, test.in)
+		v.EndEdit(e)
+		v.Sel().Clear()
+		v.Settings().Set("find_wrap", test.fw)
+		for _, command := range commands {
+			ed.CommandHandler().RunTextCommand(v, command, backend.Args{"search_text":[]rune(test.find)})
+		}
+		if sr := v.Sel().Regions(); !reflect.DeepEqual(sr, test.exp) {
+			t.Errorf("Test %d: Expected %s, but got %s", i, test.exp, sr)
+		}
+		e = v.BeginEdit()
+		v.Erase(e, text.Region{0, v.Size()})
+		v.EndEdit(e)
+	}
+}
+
 type replaceTest struct {
 	cursors []text.Region
 	in      string
