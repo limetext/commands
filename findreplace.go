@@ -6,7 +6,6 @@ package commands
 
 import (
 	"errors"
-	// "fmt"
 	"github.com/limetext/backend"
 	"github.com/limetext/text"
 )
@@ -36,14 +35,14 @@ type (
 		backend.DefaultCommand
 	}
 
-	FindAll struct{
+	FindAll struct {
 		backend.DefaultCommand
 		SearchText []rune
 	}
 
-	ReplaceAll struct{
+	ReplaceAll struct {
 		backend.DefaultCommand
-		SearchText []rune
+		SearchText  []rune
 		ReplaceText []rune
 	}
 )
@@ -79,7 +78,6 @@ func (c *FindUnderExpand) Run(v *backend.View, e *backend.Edit) error {
 	return nil
 }
 
-
 func nextSelection(v *backend.View, search string) (text.Region, error) {
 	sel := v.Sel()
 	rs := sel.Regions()
@@ -106,7 +104,7 @@ func nextSelection(v *backend.View, search string) (text.Region, error) {
 	return text.Region{-1, -1}, errors.New("Selection not Found")
 }
 
-func (c *FindAll) Run(v *backend.View, e *backend.Edit) error{
+func (c *FindAll) Run(v *backend.View, e *backend.Edit) error {
 	if len(c.SearchText) == 0 {
 		return nil
 	}
@@ -116,7 +114,7 @@ func (c *FindAll) Run(v *backend.View, e *backend.Edit) error{
 	wrap := v.Settings().Bool("find_wrap")
 	v.Settings().Set("find_wrap", false)
 	search := string(c.SearchText)
-	sel := v.Sel() 
+	sel := v.Sel()
 	sel.Clear()
 	for {
 		selection, err := nextSelection(v, search)
@@ -157,13 +155,13 @@ func (c *FindNext) Run(v *backend.View, e *backend.Edit) error {
 	return nil
 }
 
-func (c *ReplaceAll) Run(v *backend.View, e *backend.Edit) error{
+func (c *ReplaceAll) Run(v *backend.View, e *backend.Edit) error {
 	if len(c.SearchText) == 0 {
 		return nil
 	}
 	search := string(c.SearchText)
 	replace := string(c.ReplaceText)
-	sel := v.Sel() 
+	sel := v.Sel()
 	sel.Clear()
 	/* Original state of find_wrap is stored and then is made false so that nextSection doesn't go into an infinate loop.
 	   Later in the end, it is returned to it's original state.
@@ -179,7 +177,7 @@ func (c *ReplaceAll) Run(v *backend.View, e *backend.Edit) error{
 		v.Insert(e, selection.Begin(), replace)
 		sel := v.Sel()
 		sel.Clear()
-		sel.Add(text.Region{selection.Begin(),selection.Begin()+len(replace)})
+		sel.Add(text.Region{selection.Begin(), selection.Begin() + len(replace)})
 	}
 	v.Settings().Set("find_wrap", wrap)
 	return nil

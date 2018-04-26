@@ -99,11 +99,11 @@ func TestFindNext(t *testing.T) {
 	runFindTest(tests, t, "find_under_expand", "find_next")
 }
 
-type replaceAllTest struct{
-	find string
+type replaceAllTest struct {
+	find    string
 	replace string
-	in string
-	exp string
+	in      string
+	exp     string
 }
 
 func TestReplaceAll(t *testing.T) {
@@ -128,23 +128,23 @@ func TestReplaceAll(t *testing.T) {
 		},
 	}
 
-	runReplaceAllTest(tests, t,"replace_all")
+	runReplaceAllTest(tests, t, "replace_all")
 }
 
-func runReplaceAllTest(tests []replaceAllTest, t *testing.T,commands ...string) {
+func runReplaceAllTest(tests []replaceAllTest, t *testing.T, commands ...string) {
 	ed := backend.GetEditor()
 	w := ed.NewWindow()
 
 	v := w.NewFile()
 	v.Settings().Set("find_wrap", false)
 
-	for i,test := range tests {
+	for i, test := range tests {
 		e := v.BeginEdit()
-		v.Insert(e,0,test.in)
+		v.Insert(e, 0, test.in)
 		v.EndEdit(e)
 		v.Sel().Clear()
 		for _, command := range commands {
-			ed.CommandHandler().RunTextCommand(v, command, backend.Args{"search_text":[]rune(test.find),"replace_text":[]rune(test.replace)})
+			ed.CommandHandler().RunTextCommand(v, command, backend.Args{"search_text": []rune(test.find), "replace_text": []rune(test.replace)})
 		}
 		if out := v.Substr(text.Region{0, v.Size()}); out != test.exp {
 			t.Errorf("Test %d failed: %s", i, out)
@@ -155,11 +155,11 @@ func runReplaceAllTest(tests []replaceAllTest, t *testing.T,commands ...string) 
 	}
 }
 
-type findAllTest struct{
+type findAllTest struct {
 	find string
-	in string
-	exp []text.Region
-	fw bool
+	in   string
+	exp  []text.Region
+	fw   bool
 }
 
 func TestFindAll(t *testing.T) {
@@ -169,19 +169,18 @@ func TestFindAll(t *testing.T) {
 			"abc cde dce abc abc",
 			[]text.Region{{0, 3}, {12, 15}, {16, 19}},
 			true,
-
 		},
 		{
 			",\n",
 			"abc,\nbca,\n,cde,\n",
-			[]text.Region{{3,5},{8,10},{14,16}},
+			[]text.Region{{3, 5}, {8, 10}, {14, 16}},
 			false,
 		},
 	}
 	runFindAllTest(tests, t, "find_all")
 }
 
-func runFindAllTest(tests []findAllTest, t *testing.T, commands ...string){
+func runFindAllTest(tests []findAllTest, t *testing.T, commands ...string) {
 	ed := backend.GetEditor()
 	w := ed.NewWindow()
 	defer w.Close()
@@ -198,7 +197,7 @@ func runFindAllTest(tests []findAllTest, t *testing.T, commands ...string){
 		v.Sel().Clear()
 		v.Settings().Set("find_wrap", test.fw)
 		for _, command := range commands {
-			ed.CommandHandler().RunTextCommand(v, command, backend.Args{"search_text":[]rune(test.find)})
+			ed.CommandHandler().RunTextCommand(v, command, backend.Args{"search_text": []rune(test.find)})
 		}
 		if sr := v.Sel().Regions(); !reflect.DeepEqual(sr, test.exp) {
 			t.Errorf("Test %d: Expected %s, but got %s", i, test.exp, sr)
