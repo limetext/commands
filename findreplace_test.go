@@ -126,6 +126,12 @@ func TestReplaceAll(t *testing.T) {
 			"//This is a comment //Test Comment",
 			"#This is a comment #Test Comment",
 		},
+		{
+			"",
+			"#",
+			"Empty Search text",
+			"Empty Search text",
+		},
 	}
 
 	runReplaceAllTest(tests, t, "replace_all")
@@ -174,6 +180,12 @@ func TestFindAll(t *testing.T) {
 			",\n",
 			"abc,\nbca,\n,cde,\n",
 			[]text.Region{{3, 5}, {8, 10}, {14, 16}},
+			false,
+		},
+		{
+			"",
+			"abc,\nbca,\n,cde,\n",
+			[]text.Region{},
 			false,
 		},
 	}
