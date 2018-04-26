@@ -74,7 +74,7 @@ func runClipboardTest(command string, tests *[]copyTest, t *testing.T) {
 		}
 
 		if auto != test.expAutoExpanded {
-			t.Errorf("Test %d: Expected the clipboard's auto-expanded flag to be %q, but got %q", i, test.expAutoExpanded, auto)
+			t.Errorf("Test %d: Expected the clipboard's auto-expanded flag to be %t, but got %q", i, test.expAutoExpanded, auto)
 		}
 
 		b := v.Substr(text.Region{A: 0, B: v.Size()})
