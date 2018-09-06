@@ -5,6 +5,7 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/limetext/backend"
 )
 
@@ -45,13 +46,17 @@ func (c *NewWindow) Run(w *backend.Window) error {
 
 // Run executes the CloseAll command.
 func (c *CloseAll) Run(w *backend.Window) error {
-	w.CloseAllViews()
+	if !w.CloseAllViews(){
+		return fmt.Errorf("Window{id:%d} failed to close all windows", w.Id())
+	}
 	return nil
 }
 
 // Run executes the CloseWindow command.
 func (c *CloseWindow) Run(w *backend.Window) error {
-	w.Close()
+	if !w.Close() {
+		return fmt.Errorf("Window{id:%d} failed to close window", w.Id())
+	}
 	return nil
 }
 
@@ -65,7 +70,9 @@ func (c *NewWindowApp) Run() error {
 // Run executes the CloseWindowApp command.
 func (c *CloseWindowApp) Run() error {
 	ed := backend.GetEditor()
-	ed.ActiveWindow().Close()
+	if !ed.ActiveWindow().Close() {
+		return fmt.Errorf("Failed to close window app")
+	}
 	return nil
 }
 
