@@ -46,7 +46,7 @@ func (c *NewWindow) Run(w *backend.Window) error {
 
 // Run executes the CloseAll command.
 func (c *CloseAll) Run(w *backend.Window) error {
-	if !w.CloseAllViews(){
+	if !w.CloseAllViews() {
 		return fmt.Errorf("Window{id:%d} failed to close all windows", w.Id())
 	}
 	return nil
