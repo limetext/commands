@@ -48,7 +48,7 @@ func runMoveTest(tests []MoveTest, t *testing.T, text string) {
 		}
 		ed.CommandHandler().RunTextCommand(v, "move", args)
 		if sr := v.Sel().Regions(); !reflect.DeepEqual(sr, test.exp) {
-			t.Errorf("Test %d failed. Expected %v, but got %v: %+v", i, test.exp, sr, test)
+			t.Errorf("Test %d: Expected %v, but got %v", i, test.exp, sr)
 		}
 	}
 }
@@ -413,6 +413,14 @@ func TestMoveWhenWeHaveTabs(t *testing.T) {
 			false,
 			true,
 			[]text.Region{{35, 35}},
+			nil,
+		},
+		{
+			[]text.Region{{0, 0}, {1, 1}, {2, 2}, {4, 4}, {7, 7}},
+			"lines",
+			false,
+			true,
+			[]text.Region{{27, 27}, {28, 28}, {29, 29}, {31, 31}},
 			nil,
 		},
 	}

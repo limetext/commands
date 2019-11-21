@@ -304,9 +304,23 @@ func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 			// 1 character but we need to count them as tab_size
 			// from settings
 			size := v.Settings().Int("tab_size", 4)
-			toTabs := strings.Count(v.Substr(toLine), "\t")
-			fromTabs := strings.Count(v.Substr(fromLine), "\t")
-			col += (fromTabs - toTabs) * (size - 1)
+			fromTabs := strings.Count(v.Substr(text.Region{fromLine.Begin(), in.B}), "\t")
+			col += fromTabs * (size - 1)
+
+			tab := strings.Repeat("\t", size)
+			toText := strings.Replace(v.Substr(toLine), "\t", tab, -1)
+			if col > len(toText) {
+				col = len(toText)
+			}
+			toText = toText[:col]
+			toTabs := strings.Count(toText, "\t")
+
+			col -= (size - 1) * (toTabs / size)
+			mod := toTabs % size
+			col -= mod
+			if mod > size/2 {
+				col += 1
+			}
 
 			if col > toLine.Size() {
 				col = toLine.Size()
