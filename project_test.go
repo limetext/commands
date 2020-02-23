@@ -15,7 +15,7 @@ func TestSaveProjectAs(t *testing.T) {
 	const testfile = "testdata/save_project_as"
 	defer os.Remove(testfile)
 
-	var fe scfe
+	var fe front
 	fe.files = []string{testfile}
 	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
@@ -32,7 +32,7 @@ func TestSaveProjectAs(t *testing.T) {
 
 func TestPromptAddFolder(t *testing.T) {
 	const testfolder = "testdata"
-	var fe scfe
+	var fe front
 	fe.files = []string{testfolder}
 
 	ed := backend.GetEditor()

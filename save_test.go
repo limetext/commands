@@ -73,7 +73,7 @@ func TestSaveAs(t *testing.T) {
 		t.Fatalf("Couldn't write test file %s", testfile)
 	}
 
-	var fe scfe
+	var fe front
 	const name = "testdata/save_as_test.txt"
 	fe.files = []string{name}
 
@@ -122,9 +122,9 @@ func TestSaveAll(t *testing.T) {
 	}
 
 	ed := backend.GetEditor()
-	ed.SetFrontend(&scfe{})
+	ed.SetFrontend(&front{})
 	fe := ed.Frontend()
-	if dfe, ok := fe.(*scfe); ok {
+	if dfe, ok := fe.(*front); ok {
 		// Make it *not* reload the file
 		dfe.SetDefaultAction(false)
 	}

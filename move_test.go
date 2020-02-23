@@ -427,36 +427,36 @@ func TestMoveWhenWeHaveTabs(t *testing.T) {
 	runMoveTest(tests, t, inputText)
 }
 
-type scfe struct {
+type front struct {
 	show          text.Region
 	defaultAction bool
 	files         []string
 }
 
-func (f *scfe) StatusMessage(msg string) {}
-func (f *scfe) ErrorMessage(msg string)  {}
-func (f *scfe) MessageDialog(msg string) {}
+func (f *front) StatusMessage(msg string) {}
+func (f *front) ErrorMessage(msg string)  {}
+func (f *front) MessageDialog(msg string) {}
 
-func (f *scfe) SetDefaultAction(action bool) {
+func (f *front) SetDefaultAction(action bool) {
 	f.defaultAction = action
 }
-func (f *scfe) OkCancelDialog(msg string, button string) bool {
+func (f *front) OkCancelDialog(msg string, button string) bool {
 	return f.defaultAction
 }
-func (f *scfe) VisibleRegion(v *backend.View) text.Region {
+func (f *front) VisibleRegion(v *backend.View) text.Region {
 	s := v.Line(v.TextPoint(3*3, 1))
 	e := v.Line(v.TextPoint(6*3, 1))
 	return text.Region{s.Begin(), e.End()}
 }
-func (f *scfe) Show(v *backend.View, r text.Region) {
+func (f *front) Show(v *backend.View, r text.Region) {
 	f.show = r
 }
-func (f *scfe) Prompt(title, dir string, flags int) []string {
+func (f *front) Prompt(title, dir string, flags int) []string {
 	return f.files
 }
 
 func TestScrollLines(t *testing.T) {
-	var fe scfe
+	var fe front
 	ed := backend.GetEditor()
 	ed.SetFrontend(&fe)
 	ch := ed.CommandHandler()

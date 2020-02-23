@@ -32,7 +32,7 @@ func TestNewFile(t *testing.T) {
 }
 
 func TestOpenFile(t *testing.T) {
-	var fe scfe
+	var fe front
 	const testPath = "file_test.go"
 	fe.files = []string{testPath}
 
