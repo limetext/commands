@@ -17,13 +17,6 @@ endif
 check_license:
 	@go run $(GOPATH)/src/github.com/limetext/tasks/gen_license.go -check
 
-tasks:
-	go get -d -u github.com/limetext/tasks
-
-glide:
-	go get -v -u github.com/Masterminds/glide
-	glide install
-
 cover_dep:
 	go get -v -u github.com/mattn/goveralls
 	go get -v -u github.com/axw/gocov/gocov
