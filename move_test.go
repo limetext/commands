@@ -428,7 +428,7 @@ func TestMoveWhenWeHaveTabs(t *testing.T) {
 }
 
 type front struct {
-	show          text.Region
+	vr            text.Region
 	defaultAction bool
 	files         []string
 }
@@ -444,12 +444,10 @@ func (f *front) OkCancelDialog(msg string, button string) bool {
 	return f.defaultAction
 }
 func (f *front) VisibleRegion(v *backend.View) text.Region {
-	s := v.Line(v.TextPoint(3*3, 1))
-	e := v.Line(v.TextPoint(6*3, 1))
-	return text.Region{s.Begin(), e.End()}
+	return f.vr
 }
 func (f *front) Show(v *backend.View, r text.Region) {
-	f.show = r
+	f.vr = r
 }
 func (f *front) Prompt(title, dir string, flags int) []string {
 	return f.files
@@ -473,19 +471,21 @@ func TestScrollLines(t *testing.T) {
 		v.Insert(e, 0, "Hello World!\nTest123123\nAbrakadabra\n")
 	}
 	v.EndEdit(e)
-	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": 0})
 
-	if c := v.Line(v.TextPoint(3*3, 1)); fe.show.Begin() != c.Begin() {
-		t.Errorf("Expected %v, but got %v", c, fe.show)
+	fe.vr = text.Region{13, 71}
+
+	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": -1})
+	if fe.vr.A != 24 || fe.vr.B != 84 {
+		t.Errorf("Expected %s, but got %s", text.Region{24, 84}, fe.vr)
+	}
+
+	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": 0})
+	if fe.vr.A != 24 || fe.vr.B != 84 {
+		t.Errorf("Expected %s, but got %s", text.Region{24, 84}, fe.vr)
 	}
 
 	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": 1})
-	if c := v.Line(v.TextPoint(3*3-1, 1)); fe.show.Begin() != c.Begin() {
-		t.Errorf("Expected %v, but got %v", c, fe.show)
-	}
-	t.Log(fe.VisibleRegion(v), v.Line(v.TextPoint(6*3+1, 1)))
-	ch.RunTextCommand(v, "scroll_lines", backend.Args{"amount": -1})
-	if c := v.Line(v.TextPoint(6*3+1, 1)); fe.show.Begin() != c.Begin() {
-		t.Errorf("Expected %v, but got %v", c, fe.show)
+	if fe.vr.A != 13 || fe.vr.B != 71 {
+		t.Errorf("Expected %s, but got %s", text.Region{13, 71}, fe.vr)
 	}
 }

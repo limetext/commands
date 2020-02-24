@@ -341,16 +341,19 @@ func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 	case SubWords:
 		moveAction(v, c.Extend, func(in text.Region) int {
 			return v.FindByClass(in.B, c.Forward, backend.CLASS_SUB_WORD_START|
-				backend.CLASS_WORD_START|backend.CLASS_PUNCTUATION_START|backend.CLASS_LINE_END|
-				backend.CLASS_LINE_START)
+				backend.CLASS_WORD_START|backend.CLASS_PUNCTUATION_START|
+				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case SubWordEnds:
 		moveAction(v, c.Extend, func(in text.Region) int {
 			return v.FindByClass(in.B, c.Forward, backend.CLASS_SUB_WORD_END|
-				backend.CLASS_WORD_END|backend.CLASS_PUNCTUATION_END|backend.CLASS_LINE_END|
-				backend.CLASS_LINE_START)
+				backend.CLASS_WORD_END|backend.CLASS_PUNCTUATION_END|
+				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case Pages:
+		// ed := backend.GetEditor()
+		// vr := ed.Frontend().VisibleRegion(v)
+		// ls := v.Lines(vr)
 		// TODO: Should know how many lines does the frontend show in one page
 	}
 	return nil
@@ -390,21 +393,22 @@ func reverse(s string) string {
 	return string(r)
 }
 
-// Run executes the ScrollLines command.
 func (c *ScrollLines) Run(v *backend.View, e *backend.Edit) error {
-	ed := backend.GetEditor()
-	fe := ed.Frontend()
+	fe := backend.GetEditor().Frontend()
 	vr := fe.VisibleRegion(v)
-	var r int
-	if c.Amount >= 0 {
-		r, _ = v.RowCol(vr.Begin())
-		r -= c.Amount
-	} else {
-		r, _ = v.RowCol(vr.End() - 1)
-		r -= c.Amount
-	}
-	r = v.TextPoint(r, 0)
-	fe.Show(v, text.Region{A: r, B: r})
+
+	r1, _ := v.RowCol(vr.Begin())
+	r2, _ := v.RowCol(vr.End())
+	r1 -= c.Amount
+	r2 -= c.Amount
+
+	a := v.TextPoint(r1, 0)
+	b := v.TextPoint(r2, 0)
+	r := v.Line(b)
+	b = r.End()
+
+	fe.Show(v, text.Region{a, b})
+
 	return nil
 }
 
