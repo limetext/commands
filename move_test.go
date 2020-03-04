@@ -427,6 +427,117 @@ func TestMoveWhenWeHaveTabs(t *testing.T) {
 	runMoveTest(tests, t, inputText)
 }
 
+func TestMoveNeedingScroll(t *testing.T) {
+	input := "Hello World!\nTest123123\nAbrakadabra\n"
+	for i := 0; i < 9; i++ {
+		input += input
+	}
+	tests := []struct {
+		MoveTest
+		inVr, expVr text.Region
+	}{
+		{
+			MoveTest{
+				[]text.Region{text.Region{59, 59}},
+				"characters",
+				false,
+				true,
+				[]text.Region{text.Region{60, 60}},
+				nil,
+			},
+			text.Region{0, 59},
+			text.Region{13, 71},
+		},
+		{
+			MoveTest{
+				[]text.Region{text.Region{1, 1}},
+				"characters",
+				false,
+				false,
+				[]text.Region{text.Region{0, 0}},
+				nil,
+			},
+			text.Region{0, 59},
+			text.Region{0, 59},
+		},
+		{
+			MoveTest{
+				[]text.Region{text.Region{13, 13}},
+				"characters",
+				false,
+				false,
+				[]text.Region{text.Region{12, 12}},
+				nil,
+			},
+			text.Region{13, 71},
+			text.Region{0, 59},
+		},
+		{
+			MoveTest{
+				[]text.Region{text.Region{50, 50}},
+				"lines",
+				false,
+				true,
+				[]text.Region{text.Region{61, 61}},
+				nil,
+			},
+			text.Region{0, 59},
+			text.Region{13, 71},
+		},
+		{
+			MoveTest{
+				[]text.Region{text.Region{17, 17}},
+				"lines",
+				false,
+				true,
+				[]text.Region{text.Region{28, 28}},
+				nil,
+			},
+			text.Region{0, 59},
+			text.Region{0, 59},
+		},
+	}
+
+	ed := backend.GetEditor()
+	var fe front
+	ed.SetFrontend(&fe)
+	w := ed.NewWindow()
+	v := w.NewFile()
+
+	defer func() {
+		v.SetScratch(true)
+		w.Close()
+	}()
+
+	e := v.BeginEdit()
+	v.Insert(e, 0, input)
+	v.EndEdit(e)
+
+	for i, test := range tests {
+		v.Sel().Clear()
+		for _, r := range test.in {
+			v.Sel().Add(r)
+		}
+		fe.vr = test.inVr
+
+		args := backend.Args{"by": test.by, "extend": test.extend, "forward": test.forward}
+		if test.args != nil {
+			for k, v := range test.args {
+				args[k] = v
+			}
+		}
+		ed.CommandHandler().RunTextCommand(v, "move", args)
+
+		if sr := v.Sel().Regions(); !reflect.DeepEqual(sr, test.exp) {
+			t.Errorf("Test %d: Expected %v, but got %v", i, test.exp, sr)
+		}
+		if vr := ed.Frontend().VisibleRegion(v); vr.String() != test.expVr.String() {
+			t.Errorf("Test %d: Expected visible region %s, but got %s",
+				i, test.expVr, vr)
+		}
+	}
+}
+
 type front struct {
 	vr            text.Region
 	defaultAction bool

@@ -95,26 +95,33 @@ const (
 )
 
 func moveAction(v *backend.View, extend bool, transform func(r text.Region) int) {
+	fe := backend.GetEditor().Frontend()
 	sel := v.Sel()
-	r := sel.Regions()
+	rs := sel.Regions()
 	bs := v.Size()
-	for i := range r {
-		r[i].B = transform(r[i])
-		if r[i].B < 0 {
-			r[i].B = 0
-		} else if r[i].B > bs {
+	for i := range rs {
+		row1, _ := v.RowCol(rs[i].B)
+		rs[i].B = transform(rs[i])
+
+		if rs[i].B < 0 {
+			rs[i].B = 0
+		} else if rs[i].B > bs {
 			// Yes > the size, and not size-1 because the cursor being at "size"
 			// is the position it will be at when we are appending
 			// to the buffer.
-			r[i].B = bs
+			rs[i].B = bs
 		}
+		row2, _ := v.RowCol(rs[i].B)
 
+		if row2 != row1 && !fe.VisibleRegion(v).Contains(rs[i].B) {
+			scrollLine(v, row1-row2)
+		}
 		if !extend {
-			r[i].A = r[i].B
+			rs[i].A = rs[i].B
 		}
 	}
 	sel.Clear()
-	sel.AddAll(r)
+	sel.AddAll(rs)
 }
 
 // Set will define the type of move
@@ -394,13 +401,19 @@ func reverse(s string) string {
 }
 
 func (c *ScrollLines) Run(v *backend.View, e *backend.Edit) error {
+	scrollLine(v, c.Amount)
+
+	return nil
+}
+
+func scrollLine(v *backend.View, amount int) {
 	fe := backend.GetEditor().Frontend()
 	vr := fe.VisibleRegion(v)
 
 	r1, _ := v.RowCol(vr.Begin())
 	r2, _ := v.RowCol(vr.End())
-	r1 -= c.Amount
-	r2 -= c.Amount
+	r1 -= amount
+	r2 -= amount
 
 	a := v.TextPoint(r1, 0)
 	b := v.TextPoint(r2, 0)
@@ -408,8 +421,6 @@ func (c *ScrollLines) Run(v *backend.View, e *backend.Edit) error {
 	b = r.End()
 
 	fe.Show(v, text.Region{a, b})
-
-	return nil
 }
 
 func init() {
