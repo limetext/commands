@@ -438,11 +438,11 @@ func TestMoveNeedingScroll(t *testing.T) {
 	}{
 		{
 			MoveTest{
-				[]text.Region{text.Region{59, 59}},
+				[]text.Region{{59, 59}},
 				"characters",
 				false,
 				true,
-				[]text.Region{text.Region{60, 60}},
+				[]text.Region{{60, 60}},
 				nil,
 			},
 			text.Region{0, 59},
@@ -450,11 +450,11 @@ func TestMoveNeedingScroll(t *testing.T) {
 		},
 		{
 			MoveTest{
-				[]text.Region{text.Region{1, 1}},
+				[]text.Region{{1, 1}},
 				"characters",
 				false,
 				false,
-				[]text.Region{text.Region{0, 0}},
+				[]text.Region{{0, 0}},
 				nil,
 			},
 			text.Region{0, 59},
@@ -462,11 +462,11 @@ func TestMoveNeedingScroll(t *testing.T) {
 		},
 		{
 			MoveTest{
-				[]text.Region{text.Region{13, 13}},
+				[]text.Region{{13, 13}},
 				"characters",
 				false,
 				false,
-				[]text.Region{text.Region{12, 12}},
+				[]text.Region{{12, 12}},
 				nil,
 			},
 			text.Region{13, 71},
@@ -474,11 +474,11 @@ func TestMoveNeedingScroll(t *testing.T) {
 		},
 		{
 			MoveTest{
-				[]text.Region{text.Region{50, 50}},
+				[]text.Region{{50, 50}},
 				"lines",
 				false,
 				true,
-				[]text.Region{text.Region{61, 61}},
+				[]text.Region{{61, 61}},
 				nil,
 			},
 			text.Region{0, 59},
@@ -486,15 +486,51 @@ func TestMoveNeedingScroll(t *testing.T) {
 		},
 		{
 			MoveTest{
-				[]text.Region{text.Region{17, 17}},
+				[]text.Region{{17, 17}},
 				"lines",
 				false,
 				true,
-				[]text.Region{text.Region{28, 28}},
+				[]text.Region{{28, 28}},
 				nil,
 			},
 			text.Region{0, 59},
 			text.Region{0, 59},
+		},
+		{
+			MoveTest{
+				[]text.Region{{0, 0}},
+				"pages",
+				false,
+				true,
+				[]text.Region{{49, 49}},
+				nil,
+			},
+			text.Region{0, 59},
+			text.Region{49, 107},
+		},
+		{
+			MoveTest{
+				[]text.Region{{36, 36}},
+				"pages",
+				false,
+				false,
+				[]text.Region{{0, 0}},
+				nil,
+			},
+			text.Region{24, 84},
+			text.Region{0, 59},
+		},
+		{
+			MoveTest{
+				[]text.Region{{24, 24}},
+				"pages",
+				true,
+				true,
+				[]text.Region{{24, 72}},
+				nil,
+			},
+			text.Region{0, 59},
+			text.Region{49, 107},
 		},
 	}
 

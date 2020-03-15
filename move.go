@@ -94,7 +94,7 @@ const (
 	Pages
 )
 
-func moveAction(v *backend.View, extend bool, transform func(r text.Region) int) {
+func moveAction(v *backend.View, extend, scroll bool, transform func(r text.Region) int) {
 	fe := backend.GetEditor().Frontend()
 	sel := v.Sel()
 	rs := sel.Regions()
@@ -113,7 +113,7 @@ func moveAction(v *backend.View, extend bool, transform func(r text.Region) int)
 		}
 		row2, _ := v.RowCol(rs[i].B)
 
-		if row2 != row1 && !fe.VisibleRegion(v).Contains(rs[i].B) {
+		if scroll && row2 != row1 && !fe.VisibleRegion(v).Contains(rs[i].B) {
 			scrollLine(v, row1-row2)
 		}
 		if !extend {
@@ -147,25 +147,25 @@ func (mt *MoveToType) Set(v interface{}) error {
 func (c *MoveTo) Run(v *backend.View, e *backend.Edit) error {
 	switch c.To {
 	case EOL:
-		moveAction(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, true, func(r text.Region) int {
 			line := v.Line(r.B)
 			return line.B
 		})
 	case BOL:
-		moveAction(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, true, func(r text.Region) int {
 			line := v.Line(r.B)
 			return line.A
 		})
 	case BOF:
-		moveAction(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, true, func(r text.Region) int {
 			return 0
 		})
 	case EOF:
-		moveAction(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, true, func(r text.Region) int {
 			return v.Size()
 		})
 	case Brackets:
-		moveAction(v, c.Extend, func(r text.Region) (pos int) {
+		moveAction(v, c.Extend, true, func(r text.Region) (pos int) {
 			var (
 				of          int
 				co          = 1
@@ -265,7 +265,7 @@ func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 
 	switch c.By {
 	case Characters:
-		moveAction(v, c.Extend, func(r text.Region) int {
+		moveAction(v, c.Extend, true, func(r text.Region) int {
 			dir := 1
 			if !c.Forward {
 				dir = -1
@@ -273,7 +273,7 @@ func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 			return r.B + dir
 		})
 	case Stops:
-		moveAction(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, true, func(in text.Region) int {
 			tmp := v.Settings().String("word_separators", backend.DEFAULT_SEPARATORS)
 			defer v.Settings().Set("word_separators", tmp)
 			v.Settings().Set("word_separators", c.Separators)
@@ -297,7 +297,7 @@ func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 			return v.FindByClass(in.B, c.Forward, classes)
 		})
 	case Lines:
-		moveAction(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, true, func(in text.Region) int {
 			r, col := v.RowCol(in.B)
 			fromLine := v.Line(v.TextPoint(r, 0))
 			if !c.Forward {
@@ -307,63 +307,105 @@ func (c *Move) Run(v *backend.View, e *backend.Edit) error {
 			}
 			// the line we are moving to
 			toLine := v.Line(v.TextPoint(r, 0))
-			// If there is tabs in the line, buffer counts them as
-			// 1 character but we need to count them as tab_size
-			// from settings
-			size := v.Settings().Int("tab_size", 4)
-			fromTabs := strings.Count(v.Substr(text.Region{fromLine.Begin(), in.B}), "\t")
-			col += fromTabs * (size - 1)
-
-			tab := strings.Repeat("\t", size)
-			toText := strings.Replace(v.Substr(toLine), "\t", tab, -1)
-			if col > len(toText) {
-				col = len(toText)
-			}
-			toText = toText[:col]
-			toTabs := strings.Count(toText, "\t")
-
-			col -= (size - 1) * (toTabs / size)
-			mod := toTabs % size
-			col -= mod
-			if mod > size/2 {
-				col += 1
-			}
-
-			if col > toLine.Size() {
-				col = toLine.Size()
-			}
+			col = findCol(v, in, fromLine, toLine, col)
 
 			return v.TextPoint(r, col)
 		})
 	case Words:
-		moveAction(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, true, func(in text.Region) int {
 			return v.FindByClass(in.B, c.Forward, backend.CLASS_WORD_START|
 				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case WordEnds:
-		moveAction(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, true, func(in text.Region) int {
 			return v.FindByClass(in.B, c.Forward, backend.CLASS_WORD_END|
 				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case SubWords:
-		moveAction(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, true, func(in text.Region) int {
 			return v.FindByClass(in.B, c.Forward, backend.CLASS_SUB_WORD_START|
 				backend.CLASS_WORD_START|backend.CLASS_PUNCTUATION_START|
 				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case SubWordEnds:
-		moveAction(v, c.Extend, func(in text.Region) int {
+		moveAction(v, c.Extend, true, func(in text.Region) int {
 			return v.FindByClass(in.B, c.Forward, backend.CLASS_SUB_WORD_END|
 				backend.CLASS_WORD_END|backend.CLASS_PUNCTUATION_END|
 				backend.CLASS_LINE_END|backend.CLASS_LINE_START)
 		})
 	case Pages:
-		// ed := backend.GetEditor()
-		// vr := ed.Frontend().VisibleRegion(v)
-		// ls := v.Lines(vr)
-		// TODO: Should know how many lines does the frontend show in one page
+		fe := backend.GetEditor().Frontend()
+		vr := fe.VisibleRegion(v)
+		ls := v.Lines(vr)
+		l := len(ls)
+		moveAction(v, c.Extend, false, func(in text.Region) int {
+			row, col := v.RowCol(in.B)
+			fromLine := v.Line(v.TextPoint(row, 0))
+			dir := -1
+			if c.Forward {
+				dir = 1
+			}
+
+			row += dir * (l - 1)
+			toLine := v.Line(v.TextPoint(row, 0))
+			col = findCol(v, in, fromLine, toLine, col)
+
+			return v.TextPoint(row, col)
+		})
+
+		dir := -1
+		if c.Forward {
+			dir = 1
+		}
+		row, _ := v.RowCol(ls[0].Begin())
+
+		row += dir * (l - 1)
+		if row < 0 {
+			row = 0
+		}
+		if end, _ := v.RowCol(v.Size()); row+l-1 > end {
+			row = end - l + 1
+		}
+
+		end := row + l - 1
+
+		a, b := v.TextPoint(row, 0), v.TextPoint(end, 0)
+		r := v.Line(b)
+		b = r.End()
+
+		fe.Show(v, text.Region{a, b})
 	}
 	return nil
+}
+
+// If there is tabs in the fromLine, buffer counts them as 1 character but we
+// need to count them as tab_size from settings and find the column we should
+// move to in toLine based on that
+func findCol(v *backend.View, in, fromLine, toLine text.Region, col int) int {
+	size := v.Settings().Int("tab_size", 4)
+	fromTabs := strings.Count(v.Substr(text.Region{fromLine.Begin(), in.B}), "\t")
+	col += fromTabs * (size - 1)
+
+	tab := strings.Repeat("\t", size)
+	toText := strings.Replace(v.Substr(toLine), "\t", tab, -1)
+	if col > len(toText) {
+		col = len(toText)
+	}
+	toText = toText[:col]
+	toTabs := strings.Count(toText, "\t")
+
+	col -= (size - 1) * (toTabs / size)
+	mod := toTabs % size
+	col -= mod
+	if mod > size/2 {
+		col += 1
+	}
+
+	if col > toLine.Size() {
+		col = toLine.Size()
+	}
+
+	return col
 }
 
 // Default returns the default seprators.
